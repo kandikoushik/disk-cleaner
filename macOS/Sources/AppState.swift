@@ -4,7 +4,7 @@ enum Page: String, CaseIterable, Identifiable {
     case clean = "Clean", explore = "Explore", spacelens = "Space Lens"
     case apps = "Apps", duplicates = "Duplicates", privacy = "Privacy"
     case shredder = "Shredder", maintenance = "Maintenance", activity = "Activity"
-    case devices = "Devices", settings = "Settings"
+    case devices = "Devices", system = "System", settings = "Settings"
     var id: String { rawValue }
     var icon: String {
         switch self {
@@ -18,6 +18,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .maintenance: return "wrench.and.screwdriver"
         case .activity: return "bolt.horizontal"
         case .devices: return "cable.connector"
+        case .system: return "cpu"
         case .settings: return "gearshape"
         }
     }

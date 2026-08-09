@@ -69,6 +69,7 @@ struct ContentView: View {
                         case .maintenance: MaintenanceView()
                         case .activity:    ActivityView()
                     case .devices:     DevicesView()
+                    case .system:      SystemView()
                         case .settings:    SettingsView()
                         }
                     }

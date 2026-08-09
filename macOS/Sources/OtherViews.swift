@@ -201,13 +201,34 @@ struct ActivityView: View {
                 .padding(.bottom, 6)
             }
 
-            SectionHeader(title: "Top processes by memory",
-                          trailing: fmtBytes(app.procs.reduce(0) { $0 + $1.rss }) + " resident")
+            HStack {
+                SectionHeader(title: "Top processes by memory",
+                              trailing: fmtBytes(app.procs.reduce(0) { $0 + $1.rss }) + " resident")
+                Spacer()
+                Button("⚡ Purge RAM Cache") {
+                    _ = Shell.bash("/usr/bin/purge")
+                    app.say("Inactive system RAM cache purged!")
+                    app.loadActivity()
+                }
+                .glassButton(prominent: true)
+                .tint(.brand)
+            }
+            .padding(.bottom, 6)
+
             ForEach(app.procs) { p in
                 HStack(spacing: 11) {
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(p.name).font(.system(size: 13, weight: .medium))
-                            .lineLimit(1).truncationMode(.middle)
+                        HStack(spacing: 6) {
+                            Text(p.name).font(.system(size: 13, weight: .semibold))
+                                .lineLimit(1).truncationMode(.middle)
+                            if p.rss > 500 * 1024 * 1024 {
+                                Text("🚨 RAM HOG")
+                                    .font(.system(size: 9, weight: .bold))
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.riskReview.opacity(0.2), in: Capsule())
+                                    .foregroundStyle(Color.riskReview)
+                            }
+                        }
                         Text("pid \(p.pid) · \(p.user)")
                             .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
                     }
@@ -218,8 +239,8 @@ struct ActivityView: View {
                         Text("protected").font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.inkSecondary).frame(width: 62)
                     } else if p.mine {
-                        Button("Quit") { pendingQuit = p }
-                            .controlSize(.small).tint(.riskReview).frame(width: 62)
+                        Button("Kill Process") { pendingQuit = p }
+                            .controlSize(.small).tint(.riskReview).frame(width: 76)
                     } else {
                         Text("other user").font(.system(size: 10, weight: .semibold))
                             .foregroundStyle(Color.inkSecondary).frame(width: 62)
