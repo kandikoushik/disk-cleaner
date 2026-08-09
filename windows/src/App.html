@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disk Cleaner Native (Windows Edition)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="window-container">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div style="font-size: 32px;">✨</div>
+      <div>
+        <div class="hero-title">Disk Cleaner Native</div>
+        <div class="hero-sub">Windows Edition · Fast, Zero-Daemon System & Developer Optimizer</div>
+      </div>
+    </div>
+
+    <!-- 9-Tab Navigation -->
+    <nav class="tab-bar">
+      <button class="tab-btn active" onclick="setTab('clean')">✨ Clean</button>
+      <button class="tab-btn" onclick="setTab('explore')">📊 Explore</button>
+      <button class="tab-btn" onclick="setTab('spacelens')">☀️ Space Lens</button>
+      <button class="tab-btn" onclick="setTab('apps')">📦 Apps</button>
+      <button class="tab-btn" onclick="setTab('duplicates')">📄 Duplicates</button>
+      <button class="tab-btn" onclick="setTab('privacy')">🔒 Privacy</button>
+      <button class="tab-btn" onclick="setTab('shredder')">🗑️ Shredder</button>
+      <button class="tab-btn" onclick="setTab('maintenance')">🛠️ Maintenance</button>
+      <button class="tab-btn" onclick="setTab('activity')">⚡ Activity</button>
+      <button class="tab-btn" onclick="setTab('settings')">⚙️ Settings</button>
+    </nav>
+
+    <!-- Dynamic Main Content Area -->
+    <main id="content-area" class="glass-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 id="view-title">Clean Targets</h2>
+        <button class="btn-primary" onclick="scanTargets()">Rescan Windows Disk</button>
+      </div>
+
+      <div id="target-list">
+        <!-- Target rows will populate dynamically -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Permanent Immutable Brand Signature Footer -->
+  <footer class="dyuthi-footer">
+    <span class="dyuthi-icon">🛡️</span>
+    <span>Built by Dyuthi Tech Solutions</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+{
+  "appName": "Disk Cleaner Native (Windows)",
+  "version": "2.0.0",
+  "brand": "Built by Dyuthi Tech Solutions",
+  "targets": [
+    {
+      "id": "win_user_temp",
+      "label": "User Temp Files",
+      "note": "Temporary files created by apps under %TEMP%. Safe to remove.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "%TEMP%\\*"
+    },
+    {
+      "id": "win_sys_temp",
+      "label": "System Temp Files",
+      "note": "System-wide temporary files under C:\\Windows\\Temp.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "C:\\Windows\\Temp\\*"
+    },
+    {
+      "id": "win_prefetch",
+      "label": "Windows Prefetch Cache",
+      "note": "Application launch index caches under C:\\Windows\\Prefetch.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "C:\\Windows\\Prefetch\\*"
+    },
+    {
+      "id": "win_update_cache",
+      "label": "Windows Update Download Cache",
+      "note": "Downloaded Windows Update installation files under SoftwareDistribution\\Download.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "C:\\Windows\\SoftwareDistribution\\Download\\*"
+    },
+    {
+      "id": "win_crash_dumps",
+      "label": "Windows Crash Dumps",
+      "note": "Application crash logs and memory dumps under %LOCALAPPDATA%\\CrashDumps.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "%LOCALAPPDATA%\\CrashDumps\\*"
+    },
+    {
+      "id": "nuget_cache",
+      "label": "NuGet Package Cache",
+      "note": ".NET package cache under %USERPROFILE%\\.nuget\\packages. Re-downloaded on build.",
+      "risk": "safe",
+      "category": "Package managers",
+      "pathPattern": "%USERPROFILE%\\.nuget\\packages\\*"
+    },
+    {
+      "id": "cargo_win_cache",
+      "label": "Cargo (Rust) Cache",
+      "note": "Rust crates registry cache under %USERPROFILE%\\.cargo.",
+      "risk": "safe",
+      "category": "Package managers",
+      "pathPattern": "%USERPROFILE%\\.cargo\\registry\\*"
+    },
+    {
+      "id": "go_win_cache",
+      "label": "Go Build Cache",
+      "note": "Compiled Go packages under %LOCALAPPDATA%\\go-build.",
+      "risk": "safe",
+      "category": "Package managers",
+      "pathPattern": "%LOCALAPPDATA%\\go-build\\*"
+    },
+    {
+      "id": "gradle_win_cache",
+      "label": "Gradle Build Cache",
+      "note": "Android and Java Gradle cache under %USERPROFILE%\\.gradle\\caches.",
+      "risk": "safe",
+      "category": "Android",
+      "pathPattern": "%USERPROFILE%\\.gradle\\caches\\*"
+    },
+    {
+      "id": "ai_ollama_win",
+      "label": "Ollama LLM Models",
+      "note": "Local GGUF models under %USERPROFILE%\\.ollama\\models.",
+      "risk": "review",
+      "category": "Apps",
+      "pathPattern": "%USERPROFILE%\\.ollama\\models\\*"
+    },
+    {
+      "id": "ai_huggingface_win",
+      "label": "HuggingFace Cache",
+      "note": "Downloaded model weights and tokenizers under %USERPROFILE%\\.cache\\huggingface.",
+      "risk": "safe",
+      "category": "Apps",
+      "pathPattern": "%USERPROFILE%\\.cache\\huggingface\\*"
+    },
+    {
+      "id": "vscode_win_cache",
+      "label": "VS Code Caches",
+      "note": "VS Code code and extension caches under %APPDATA%\\Code\\Cache.",
+      "risk": "safe",
+      "category": "Apps",
+      "pathPattern": "%APPDATA%\\Code\\Cache\\*"
+    },
+    {
+      "id": "edge_win_cache",
+      "label": "Microsoft Edge Cache",
+      "note": "Edge browser web and service worker caches under %LOCALAPPDATA%\\Microsoft\\Edge.",
+      "risk": "safe",
+      "category": "Apps",
+      "pathPattern": "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Cache\\*"
+    },
+    {
+      "id": "chrome_win_cache",
+      "label": "Google Chrome Cache",
+      "note": "Chrome browser caches under %LOCALAPPDATA%\\Google\\Chrome.",
+      "risk": "safe",
+      "category": "Apps",
+      "pathPattern": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache\\*"
+    }
+  ]
+}

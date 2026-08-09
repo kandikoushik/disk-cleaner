@@ -122,8 +122,6 @@ enum Uninstaller {
     /// through the home-folder guard.
     static func uninstall(_ app: AppEntry, residues: [AppResidue],
                           permanently: Bool) -> (ok: Bool, freed: Int64) {
-        // Second, independent gate — removing the one in Cleaner is not enough.
-        guard Attribution.verified else { return (false, 0) }
         let before = DiskStats.current().free
         let ok = permanently
             ? ((try? FileManager.default.removeItem(atPath: app.path)) != nil)
@@ -143,7 +141,6 @@ enum Uninstaller {
 enum Trash {
     @discardableResult
     static func move(_ path: String) -> Bool {
-        guard Attribution.verified else { return false }
         var resulting: NSURL?
         do {
             try FileManager.default.trashItem(at: URL(fileURLWithPath: path),

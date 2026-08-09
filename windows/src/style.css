@@ -1,0 +1,184 @@
+/* Fluent Mica / Acrylic Liquid Glass Design System for Windows */
+
+:root {
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  --glass-bg: rgba(30, 41, 59, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-hover: rgba(255, 255, 255, 0.08);
+  --brand: #3b82f6;
+  --brand-secondary: #8b5cf6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --risk-safe: #10b981;
+  --risk-rebuild: #f59e0b;
+  --risk-review: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
+  user-select: none;
+}
+
+body {
+  background: var(--bg-gradient);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.window-container {
+  max-width: 1080px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  flex: 1;
+}
+
+/* Glass Card Component */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Header & Hero */
+.hero-banner {
+  background: linear-gradient(135deg, var(--brand), var(--brand-secondary));
+  border-radius: 18px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+.hero-title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hero-sub {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Glass Tab Bar */
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  padding: 6px;
+  border-radius: 40px;
+  border: 1px solid var(--glass-border);
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--text-main);
+  background: var(--glass-hover);
+}
+
+.tab-btn.active {
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--brand), var(--brand-secondary));
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Target Row */
+.target-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.target-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.risk-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.risk-safe { background: rgba(16, 185, 129, 0.15); color: var(--risk-safe); }
+.risk-rebuild { background: rgba(245, 158, 11, 0.15); color: var(--risk-rebuild); }
+.risk-review { background: rgba(239, 68, 68, 0.15); color: var(--risk-review); }
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-secondary));
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Permanent Immutable Dyuthi Footer */
+.dyuthi-footer {
+  margin-top: auto;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--glass-border);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+.dyuthi-icon {
+  color: var(--brand);
+}

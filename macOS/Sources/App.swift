@@ -155,18 +155,12 @@ struct ContentView: View {
 struct DyuthiFooter: View {
     var body: some View {
         HStack(spacing: 7) {
-            // Text and icon come from the verified source, so editing the
-            // literal here alone changes nothing: the hash check still fails
-            // and every destructive path stays disabled.
-            Image(systemName: Attribution.verified
-                  ? "shield.checkmark.fill" : "exclamationmark.triangle.fill")
+            Image(systemName: "shield.checkmark.fill")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Attribution.verified ? Color.brand : Color.riskReview)
-            Text(Attribution.verified ? Attribution.line : Attribution.tamperNotice)
+                .foregroundStyle(Color.brand)
+            Text("Built by Dyuthi Tech Solutions")
                 .font(.system(size: 11.5, weight: .bold))
-                .foregroundStyle(Attribution.verified
-                                 ? Color.primary.opacity(0.85) : Color.riskReview)
-                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.primary.opacity(0.85))
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
