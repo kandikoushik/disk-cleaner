@@ -114,6 +114,22 @@
       "risk": "safe",
       "category": "Apps",
       "pathPattern": "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache\\*"
+    },
+    {
+      "id": "wsl2_vhdx_compact",
+      "label": "WSL2 & Docker VHDX Shrinker",
+      "note": "Reclaims un-shrunk space in ext4.vhdx and docker_data.vhdx using diskpart compact engine.",
+      "risk": "safe",
+      "category": "Developer",
+      "pathPattern": "%LOCALAPPDATA%\\Docker\\wsl\\data\\docker_data.vhdx"
+    },
+    {
+      "id": "capability_access_log",
+      "label": "CapabilityAccessManager Log Bloat",
+      "note": "Fixes runaway permission logging db-wal file bloat under %LOCALAPPDATA%\\Packages.",
+      "risk": "safe",
+      "category": "System",
+      "pathPattern": "%LOCALAPPDATA%\\Packages\\*\\LocalState\\*"
     }
   ]
 }
