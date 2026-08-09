@@ -45,27 +45,34 @@ struct ContentView: View {
             Backdrop()
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 10) {
+                    BreadcrumbsView()
+
                     hero
+
                     HStack {
                         Spacer(minLength: 0)
                         GlassTabBar(selection: $app.page)
                         Spacer(minLength: 0)
                     }
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 8)
 
-                    switch app.page {
-                    case .clean:       CleanView()
-                    case .explore:     ExploreView()
-                    case .spacelens:   SpaceLensView()
-                    case .apps:        AppsView()
-                    case .duplicates:  DuplicatesView()
-                    case .privacy:     PrivacyView()
-                    case .shredder:    ShredderView()
-                    case .maintenance: MaintenanceView()
-                    case .activity:    ActivityView()
-                    case .settings:    SettingsView()
+                    Group {
+                        switch app.page {
+                        case .clean:       CleanView()
+                        case .explore:     ExploreView()
+                        case .spacelens:   SpaceLensView()
+                        case .apps:        AppsView()
+                        case .duplicates:  DuplicatesView()
+                        case .privacy:     PrivacyView()
+                        case .shredder:    ShredderView()
+                        case .maintenance: MaintenanceView()
+                        case .activity:    ActivityView()
+                        case .settings:    SettingsView()
+                        }
                     }
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                    .animation(.spring(response: 0.35, dampingFraction: 0.78), value: app.page)
 
                     DyuthiFooter()
                         .padding(.top, 24)
@@ -90,12 +97,18 @@ struct ContentView: View {
                       label: fmtBytes(app.disk.free),
                       caption: "FREE")
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Disk Cleaner")
-                    .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
-                Text(tagline)
-                    .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.85))
-                    .padding(.bottom, 12)
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Disk Cleaner")
+                            .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+                        Text(tagline)
+                            .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.85))
+                    }
+                    Spacer()
+                    MascotView(mood: mascotMood, speechBubble: mascotMessage)
+                }
+                .padding(.bottom, 6)
 
                 // Four across when there is room, otherwise two rows.
                 ViewThatFits(in: .horizontal) {
@@ -120,6 +133,18 @@ struct ContentView: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 18, style: .continuous)
         )
+    }
+
+    private var mascotMood: MascotMood {
+        if app.scanning { return .scanning }
+        if app.selectedBytes > 0 { return .celebrate }
+        return .happy
+    }
+
+    private var mascotMessage: String {
+        if app.scanning { return "Scanning your developer targets..." }
+        if app.selectedBytes > 0 { return "Ready to reclaim \(fmtBytes(app.selectedBytes))!" }
+        return "Your Mac is running smoothly ✨"
     }
 
     @ViewBuilder
@@ -155,12 +180,18 @@ struct ContentView: View {
 struct DyuthiFooter: View {
     var body: some View {
         HStack(spacing: 7) {
-            Image(systemName: "shield.checkmark.fill")
+            // Text and icon come from the verified source, so editing the
+            // literal here alone changes nothing: the hash check still fails
+            // and every destructive path stays disabled.
+            Image(systemName: Attribution.verified
+                  ? "shield.checkmark.fill" : "exclamationmark.triangle.fill")
                 .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(Color.brand)
-            Text("Built by Dyuthi Tech Solutions")
+                .foregroundStyle(Attribution.verified ? Color.brand : Color.riskReview)
+            Text(Attribution.verified ? Attribution.line : Attribution.tamperNotice)
                 .font(.system(size: 11.5, weight: .bold))
-                .foregroundStyle(Color.primary.opacity(0.85))
+                .foregroundStyle(Attribution.verified
+                                 ? Color.primary.opacity(0.85) : Color.riskReview)
+                .multilineTextAlignment(.center)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)

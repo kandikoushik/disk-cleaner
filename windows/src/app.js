@@ -15,9 +15,13 @@ async function loadCatalog() {
 
 function setTab(tabName) {
   currentTab = tabName;
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.innerText.toLowerCase().includes(tabName));
-  });
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  const currentBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.toLowerCase().includes(tabName));
+  if (currentBtn) currentBtn.classList.add('active');
+
+  const bElem = document.getElementById('breadcrumb-current');
+  if (bElem) bElem.innerText = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+
   renderView();
 }
 

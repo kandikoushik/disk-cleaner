@@ -167,28 +167,67 @@ struct CleanView: View {
 
     private var chips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                chip("Everything", active: app.categoryFilter == nil) { app.categoryFilter = nil }
+            HStack(spacing: 7) {
+                chip(label: "Everything",
+                     dot: nil,
+                     amount: app.reclaimable,
+                     active: app.categoryFilter == nil) { app.categoryFilter = nil }
+
                 ForEach(app.liveCategories, id: \.self) { cat in
-                    chip(cat.rawValue, active: app.categoryFilter == cat) {
+                    chip(label: cat.rawValue,
+                         dot: .series(cat.slot),
+                         amount: app.byCategory.first { $0.0 == cat }?.1 ?? 0,
+                         active: app.categoryFilter == cat) {
                         app.categoryFilter = (app.categoryFilter == cat) ? nil : cat
                     }
                 }
             }
-            .padding(.vertical, 6)
-            .padding(.horizontal, 2)   // keeps glass edges off the clip bounds
+            .padding(.vertical, 7)
+            .padding(.horizontal, 2)
         }
-        .padding(.bottom, 4)
+        .padding(.bottom, 6)
     }
 
-    private func chip(_ text: String, active: Bool, action: @escaping () -> Void) -> some View {
+    /// A filter chip carries the category's colour from the chart above and the
+    /// amount it accounts for, so the row reads as a legend you can click rather
+    /// than a row of identical white pills.
+    private func chip(label: String, dot: Color?, amount: Int64,
+                      active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(text).font(.system(size: 12, weight: .medium))
-                .padding(.horizontal, 15).padding(.vertical, 7)
+            HStack(spacing: 6) {
+                if let dot {
+                    Circle().fill(dot).frame(width: 7, height: 7)
+                } else {
+                    Image(systemName: "square.grid.2x2.fill")
+                        .font(.system(size: 8, weight: .bold))
+                        .foregroundStyle(active ? Color.brand : .secondary)
+                }
+                Text(label)
+                    .font(.system(size: 12, weight: active ? .semibold : .medium))
+                if amount > 0 {
+                    Text(fmtBytes(amount))
+                        .font(.system(size: 10.5, weight: .semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 5).padding(.vertical, 1.5)
+                        .background(Capsule().fill(Color.primary.opacity(0.07)))
+                }
+            }
+            .padding(.leading, 11).padding(.trailing, amount > 0 ? 7 : 11)
+            .padding(.vertical, 6)
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .glassChip(active: active)
         .foregroundStyle(active ? Color.primary : .secondary)
+        .background {
+            Capsule().fill(active ? Color.brand.opacity(0.16) : Color.primary.opacity(0.035))
+        }
+        .overlay {
+            Capsule().strokeBorder(active ? Color.brand.opacity(0.55)
+                                          : Color.primary.opacity(0.09),
+                                   lineWidth: active ? 1.2 : 1)
+        }
+        .animation(.easeOut(duration: 0.14), value: active)
     }
 
     // ---- list ---------------------------------------------------------------

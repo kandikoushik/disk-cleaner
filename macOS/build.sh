@@ -18,9 +18,10 @@ swiftc -O -whole-module-optimization \
   -o "$APP/Contents/MacOS/DiskCleaner"
 
 echo "==> Assembling bundle"
-# Reuse the icon from the hybrid build if it is around.
-if [ -f "$HOME/disk-cleaner/build/icon.icns" ]; then
-  cp "$HOME/disk-cleaner/build/icon.icns" "$APP/Contents/Resources/icon.icns"
+if [ -f "$HERE/Resources/AppIcon.icns" ]; then
+  cp "$HERE/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+elif [ -f "$HOME/disk-cleaner/build/icon.icns" ]; then
+  cp "$HOME/disk-cleaner/build/icon.icns" "$APP/Contents/Resources/AppIcon.icns"
 fi
 
 cat > "$APP/Contents/Info.plist" <<PLIST
@@ -35,7 +36,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleShortVersionString</key><string>$VERSION</string>
   <key>CFBundlePackageType</key>       <string>APPL</string>
   <key>CFBundleExecutable</key>        <string>DiskCleaner</string>
-  <key>CFBundleIconFile</key>          <string>icon</string>
+  <key>CFBundleIconFile</key>          <string>AppIcon</string>
   <key>LSMinimumSystemVersion</key>    <string>13.0</string>
   <key>NSHighResolutionCapable</key>   <true/>
   <key>LSApplicationCategoryType</key> <string>public.app-category.utilities</string>

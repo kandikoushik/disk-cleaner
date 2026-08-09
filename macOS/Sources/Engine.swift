@@ -21,6 +21,7 @@ enum Cleaner {
 
     @discardableResult
     static func remove(_ path: String) -> Bool {
+        guard Attribution.verified else { return false }
         guard allowed(path) else { return false }
         do {
             try FileManager.default.removeItem(atPath: path)
@@ -31,6 +32,10 @@ enum Cleaner {
     }
 
     static func clean(_ target: Target) async -> CleanOutcome {
+        // Integrity gate: a build with its attribution stripped does not delete.
+        guard Attribution.verified else {
+            return CleanOutcome(label: target.label, removed: 0, skipped: 1, freed: 0)
+        }
         let before = DiskStats.current().free
         var removed = 0, skipped = 0
 

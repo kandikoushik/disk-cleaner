@@ -7,3 +7,12 @@ out/
 
 # Screenshots / scratch
 *.png
+
+# macOS clutter
+.DS_Store
+**/.DS_Store
+
+# Build output
+macOS/out/
+windows/out/
+**/*.iconset/
