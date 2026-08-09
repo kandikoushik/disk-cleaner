@@ -518,3 +518,294 @@ struct MaintenanceView: View {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Space Lens (Interactive Treemap Disk Map)
+// ---------------------------------------------------------------------------
+
+struct SpaceLensView: View {
+    @EnvironmentObject var app: AppState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Button {
+                    Task { await app.loadSpaceLens() }
+                } label: {
+                    Label("Scan Space Lens", systemImage: "sun.max")
+                }
+                .disabled(app.spaceLensLoading)
+
+                if app.spaceLensLoading {
+                    ProgressView().controlSize(.small).padding(.leading, 4)
+                }
+
+                Spacer()
+            }
+
+            SectionHeader(title: "Visual Storage Map (Top Folders)")
+
+            if app.spaceLensLoading {
+                ProgressView("Building visual storage map...")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 30)
+            } else if app.spaceLensNodes.isEmpty {
+                Text("Tap Scan Space Lens to analyze disk folders.")
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 30)
+            } else {
+                let total = max(1, app.spaceLensNodes.reduce(0) { $0 + $1.size })
+
+                Card {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Storage Map Breakdown")
+                            .font(.system(size: 13, weight: .bold))
+
+                        StackedBar(segments: app.spaceLensNodes.enumerated().map { idx, node in
+                            StackSegment(id: node.name, size: node.size, color: Color.series(idx + 1))
+                        })
+
+                        ForEach(Array(app.spaceLensNodes.enumerated()), id: \.element.id) { idx, node in
+                            HStack(spacing: 10) {
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(Color.series(idx + 1))
+                                    .frame(width: 12, height: 12)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(node.name)
+                                        .font(.system(size: 13, weight: .medium))
+                                    Text(tilde(node.path))
+                                        .font(.system(size: 10.5))
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
+
+                                MiniBar(fraction: Double(node.size) / Double(total))
+                                    .frame(width: 80)
+
+                                Text(fmtBytes(node.size))
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .monospacedDigit()
+
+                                Button("Reveal") {
+                                    Explore.reveal(node.path)
+                                }
+                                .controlSize(.small)
+                            }
+                            .padding(.vertical, 3)
+                        }
+                    }
+                }
+            }
+        }
+        .task {
+            if app.spaceLensNodes.isEmpty && !app.spaceLensLoading {
+                await app.loadSpaceLens()
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Privacy & Browser Cookie Scrubber
+// ---------------------------------------------------------------------------
+
+struct PrivacyView: View {
+    @EnvironmentObject var app: AppState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Button {
+                    Task { await app.loadPrivacy() }
+                } label: {
+                    Label("Scan Privacy Data", systemImage: "lock.shield")
+                }
+                .disabled(app.privacyLoading)
+
+                if app.privacyLoading {
+                    ProgressView().controlSize(.small).padding(.leading, 4)
+                }
+
+                Spacer()
+            }
+
+            SectionHeader(title: "Browser History, Cookies & Cache")
+
+            if app.privacyLoading {
+                ProgressView("Scanning browser data...")
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 30)
+            } else if app.privacyItems.isEmpty {
+                Text("No browser privacy data found.")
+                    .font(.system(size: 12.5))
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 30)
+            } else {
+                ForEach(app.privacyItems) { item in
+                    Card {
+                        HStack(spacing: 12) {
+                            Image(systemName: "safari")
+                                .font(.system(size: 22))
+                                .foregroundStyle(Color.brand)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.browser)
+                                    .font(.system(size: 14, weight: .bold))
+                                Text("\(item.category) · \(tilde(item.path))")
+                                    .font(.system(size: 11))
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+
+                            Text(fmtBytes(item.size))
+                                .font(.system(size: 14, weight: .bold))
+                                .monospacedDigit()
+
+                            Button("Clear Data") {
+                                Task {
+                                    Cleaner.remove(item.path)
+                                    app.say("Cleared \(item.browser) \(item.category)")
+                                    await app.loadPrivacy()
+                                }
+                            }
+                            .glassButton()
+                            .tint(.riskReview)
+                        }
+                    }
+                }
+            }
+        }
+        .task {
+            if app.privacyItems.isEmpty && !app.privacyLoading {
+                await app.loadPrivacy()
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Secure File Shredder
+// ---------------------------------------------------------------------------
+
+struct ShredderView: View {
+    @EnvironmentObject var app: AppState
+    @State private var shredPath: String = ""
+    @State private var confirmingShred = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionHeader(title: "Secure File Shredder")
+
+            Card {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "xmark.bin.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(Color.riskReview)
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Permanently Shred Files")
+                                .font(.system(size: 14, weight: .bold))
+                            Text("Overwrites target file bytes with dummy data before deletion. Irrecoverable.")
+                                .font(.system(size: 11.5))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Divider()
+
+                    HStack(spacing: 8) {
+                        TextField("Paste file path to shred (~/Downloads/secret.pdf)", text: $shredPath)
+                            .textFieldStyle(.plain)
+                            .padding(.horizontal, 10).padding(.vertical, 7)
+                            .glassSurface(radius: 8)
+
+                        Button("Select File") {
+                            let panel = NSOpenPanel()
+                            panel.canChooseFiles = true
+                            panel.canChooseDirectories = false
+                            panel.allowsMultipleSelection = false
+                            if panel.runModal() == .OK, let url = panel.url {
+                                shredPath = url.path
+                            }
+                        }
+                        .glassButton()
+                    }
+
+                    if !shredPath.isEmpty {
+                        Button("Shred File Now") {
+                            confirmingShred = true
+                        }
+                        .glassButton(prominent: true)
+                        .tint(.riskReview)
+                    }
+                }
+            }
+        }
+        .confirmationDialog("Shred File Permanently?", isPresented: $confirmingShred, titleVisibility: .visible) {
+            Button("Shred Permanently", role: .destructive) {
+                let target = shredPath
+                shredPath = ""
+                Task {
+                    await app.shred(path: target)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("File: \(shredPath)\nThis action CANNOT be undone.")
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Status Menu View (Menu Bar Companion)
+// ---------------------------------------------------------------------------
+
+struct StatusMenuView: View {
+    @EnvironmentObject var app: AppState
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("Disk Cleaner")
+                    .font(.system(size: 14, weight: .bold))
+                Spacer()
+                Text("\(fmtBytes(app.disk.free)) Free")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.brand)
+            }
+
+            MiniBar(fraction: app.disk.usedFraction)
+
+            Divider()
+
+            Button("Quick Clean Safe Caches") {
+                Task {
+                    let safe = app.states.filter { $0.target.risk == .safe && $0.hasContent }.map(\.id)
+                    await app.clean(ids: safe, label: "Quick clean done")
+                }
+            }
+
+            Button("Purge RAM Memory") {
+                _ = Maintenance.run("dns")
+                _ = Shell.bash("/usr/bin/purge")
+                app.say("RAM purged")
+            }
+
+            Divider()
+
+            Button("Quit Disk Cleaner") {
+                NSApplication.shared.terminate(nil)
+            }
+        }
+        .padding(12)
+        .frame(width: 240)
+    }
+}
+
+

@@ -19,12 +19,21 @@ struct DiskCleanerApp: App {
                 Divider()
                 Button("Clean") { app.page = .clean }.keyboardShortcut("1")
                 Button("Explore") { app.page = .explore }.keyboardShortcut("2")
-                Button("Apps") { app.page = .apps }.keyboardShortcut("3")
-                Button("Duplicates") { app.page = .duplicates }.keyboardShortcut("4")
-                Button("Maintenance") { app.page = .maintenance }.keyboardShortcut("5")
-                Button("Activity") { app.page = .activity }.keyboardShortcut("6")
+                Button("Space Lens") { app.page = .spacelens }.keyboardShortcut("3")
+                Button("Apps") { app.page = .apps }.keyboardShortcut("4")
+                Button("Duplicates") { app.page = .duplicates }.keyboardShortcut("5")
+                Button("Privacy") { app.page = .privacy }.keyboardShortcut("6")
+                Button("Shredder") { app.page = .shredder }.keyboardShortcut("7")
+                Button("Maintenance") { app.page = .maintenance }.keyboardShortcut("8")
+                Button("Activity") { app.page = .activity }.keyboardShortcut("9")
             }
         }
+
+        MenuBarExtra("Disk Cleaner", systemImage: "sparkles") {
+            StatusMenuView()
+                .environmentObject(app)
+        }
+        .menuBarExtraStyle(.window)
     }
 }
 
@@ -33,9 +42,6 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            // Liquid Glass is a lensing material: it refracts whatever sits
-            // behind it. Over a flat opaque fill it renders as an ordinary card,
-            // so the window gets a real backdrop for the glass to work against.
             Backdrop()
 
             ScrollView {
@@ -51,8 +57,11 @@ struct ContentView: View {
                     switch app.page {
                     case .clean:       CleanView()
                     case .explore:     ExploreView()
+                    case .spacelens:   SpaceLensView()
                     case .apps:        AppsView()
                     case .duplicates:  DuplicatesView()
+                    case .privacy:     PrivacyView()
+                    case .shredder:    ShredderView()
                     case .maintenance: MaintenanceView()
                     case .activity:    ActivityView()
                     }

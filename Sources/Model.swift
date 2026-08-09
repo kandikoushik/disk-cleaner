@@ -229,6 +229,23 @@ struct MaintenanceTask: Identifiable {
     var lastRun: String? = nil
 }
 
+struct SpaceLensNode: Identifiable, Hashable {
+    let id: String
+    let name: String
+    let path: String
+    let size: Int64
+    let isDirectory: Bool
+    let children: [SpaceLensNode]
+}
+
+struct PrivacyItem: Identifiable, Hashable {
+    let id: String
+    let browser: String
+    let category: String
+    let path: String
+    let size: Int64
+}
+
 // ---------------------------------------------------------------------------
 // Formatting
 // ---------------------------------------------------------------------------

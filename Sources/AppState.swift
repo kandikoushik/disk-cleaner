@@ -1,15 +1,19 @@
 import SwiftUI
 
 enum Page: String, CaseIterable, Identifiable {
-    case clean = "Clean", explore = "Explore", apps = "Apps"
-    case duplicates = "Duplicates", maintenance = "Maintenance", activity = "Activity"
+    case clean = "Clean", explore = "Explore", spacelens = "Space Lens"
+    case apps = "Apps", duplicates = "Duplicates", privacy = "Privacy"
+    case shredder = "Shredder", maintenance = "Maintenance", activity = "Activity"
     var id: String { rawValue }
     var icon: String {
         switch self {
         case .clean: return "sparkles"
         case .explore: return "chart.pie"
+        case .spacelens: return "sun.max"
         case .apps: return "shippingbox"
         case .duplicates: return "doc.on.doc"
+        case .privacy: return "lock.shield"
+        case .shredder: return "xmark.bin"
         case .maintenance: return "wrench.and.screwdriver"
         case .activity: return "bolt.horizontal"
         }
@@ -65,6 +69,12 @@ final class AppState: ObservableObject {
     @Published var duplicateGroups: [DuplicateGroup] = []
     @Published var duplicatesLoading = false
     @Published var duplicatesScanned = false
+
+    // Space Lens, Privacy & Shredder
+    @Published var spaceLensNodes: [SpaceLensNode] = []
+    @Published var spaceLensLoading = false
+    @Published var privacyItems: [PrivacyItem] = []
+    @Published var privacyLoading = false
 
     // Startup items
     @Published var startupItems: [LaunchAgentItem] = []
@@ -421,5 +431,59 @@ final class AppState: ObservableObject {
         pb.clearContents()
         pb.setString(lines.joined(separator: "\n"), forType: .string)
         say("Report copied to clipboard")
+    }
+
+    // ---- space lens, privacy & shredder ------------------------------------
+
+    func loadSpaceLens() async {
+        spaceLensLoading = true
+        var nodes: [SpaceLensNode] = []
+        let roots = ["Documents", "Downloads", "Developer", "Desktop", "Movies", "Pictures", "Library"]
+        for r in roots {
+            let path = "\(HOME)/\(r)"
+            let size = await Sizer.size(path)
+            if size > 0 {
+                nodes.append(SpaceLensNode(id: path, name: r, path: path, size: size, isDirectory: true, children: []))
+            }
+        }
+        spaceLensNodes = nodes.sorted { $0.size > $1.size }
+        spaceLensLoading = false
+    }
+
+    func loadPrivacy() async {
+        privacyLoading = true
+        var items: [PrivacyItem] = []
+        let fm = FileManager.default
+        let targets = [
+            ("Safari", "History & Cache", "\(HOME)/Library/Safari"),
+            ("Chrome", "Browser Data", "\(HOME)/Library/Application Support/Google/Chrome"),
+            ("Firefox", "Profiles & Cache", "\(HOME)/Library/Application Support/Firefox"),
+            ("Brave", "Browser Data", "\(HOME)/Library/Application Support/BraveSoftware")
+        ]
+        for (browser, cat, path) in targets {
+            if fm.fileExists(atPath: path) {
+                let s = await Sizer.size(path)
+                if s > 0 {
+                    items.append(PrivacyItem(id: path, browser: browser, category: cat, path: path, size: s))
+                }
+            }
+        }
+        privacyItems = items
+        privacyLoading = false
+    }
+
+    func shred(path: String) async {
+        guard Cleaner.allowed(path) else { say("Refused — outside your home folder"); return }
+        let fm = FileManager.default
+        if let handle = FileHandle(forWritingAtPath: path) {
+            let size = handle.seekToEndOfFile()
+            handle.seek(toFileOffset: 0)
+            let dummy = Data(repeating: 0, count: Int(min(size, 10 * 1024 * 1024)))
+            handle.write(dummy)
+            try? handle.close()
+        }
+        try? fm.removeItem(atPath: path)
+        refreshDisk()
+        say("File securely shredded")
     }
 }

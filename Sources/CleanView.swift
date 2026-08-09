@@ -151,7 +151,7 @@ struct CleanView: View {
 
     private var chips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 chip("Everything", active: app.categoryFilter == nil) { app.categoryFilter = nil }
                 ForEach(app.liveCategories, id: \.self) { cat in
                     chip(cat.rawValue, active: app.categoryFilter == cat) {
@@ -159,14 +159,16 @@ struct CleanView: View {
                     }
                 }
             }
-            .padding(.vertical, 2)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 2)   // keeps glass edges off the clip bounds
         }
+        .padding(.bottom, 4)
     }
 
     private func chip(_ text: String, active: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            Text(text).font(.system(size: 11.5, weight: .medium))
-                .padding(.horizontal, 11).padding(.vertical, 5)
+            Text(text).font(.system(size: 12, weight: .medium))
+                .padding(.horizontal, 15).padding(.vertical, 7)
         }
         .buttonStyle(.plain)
         .glassChip(active: active)

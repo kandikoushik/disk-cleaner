@@ -59,6 +59,7 @@ codesign --verify --deep --strict "$APP" && echo "    signature ok"
 
 echo "==> Building DMG"
 STAGE="$OUT/stage"
+rm -rf "$STAGE"
 mkdir -p "$STAGE"
 cp -R "$APP" "$STAGE/"
 ln -s /Applications "$STAGE/Applications"
