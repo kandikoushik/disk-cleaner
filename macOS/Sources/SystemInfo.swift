@@ -133,8 +133,54 @@ enum SystemInfo {
         return out
     }
 
-    /// Every human account on the machine, not just those currently signed in.
-    static func allAccounts() -> [InfoRow] {
+    /// A full account profile, including the picture macOS stores for it.
+    struct Profile: Identifiable, Hashable {
+        let shortName: String
+        let fullName: String
+        let isAdmin: Bool
+        let home: String
+        let shell: String
+        let uid: String
+        let avatar: Data?
+        var id: String { shortName }
+    }
+
+    private static func dscl(_ user: String, _ key: String) -> String? {
+        guard let out = Shell.run("/usr/bin/dscl", [".", "-read", "/Users/\(user)", key],
+                                  timeout: 15) else { return nil }
+        // Single-line form is "Key: value"; multi-line puts the value beneath.
+        if let r = out.range(of: "\(key):") {
+            let rest = out[r.upperBound...].trimmingCharacters(in: .whitespacesAndNewlines)
+            return rest.isEmpty ? nil : rest
+        }
+        return nil
+    }
+
+    /// The account picture. `JPEGPhoto` holds the real bytes when the user has
+    /// set one; `Picture` is only a path to a stock image, so it is the
+    /// fallback rather than the primary source.
+    static func avatar(for user: String) -> Data? {
+        if let hex = dscl(user, "JPEGPhoto") {
+            let cleaned = hex.filter { $0.isHexDigit }
+            var bytes = [UInt8]()
+            bytes.reserveCapacity(cleaned.count / 2)
+            var index = cleaned.startIndex
+            while let next = cleaned.index(index, offsetBy: 2, limitedBy: cleaned.endIndex),
+                  next <= cleaned.endIndex {
+                if let byte = UInt8(cleaned[index..<next], radix: 16) { bytes.append(byte) }
+                index = next
+            }
+            if bytes.count > 100 { return Data(bytes) }
+        }
+        if let path = dscl(user, "Picture")?
+            .trimmingCharacters(in: CharacterSet(charactersIn: "\"")),
+           FileManager.default.fileExists(atPath: path) {
+            return FileManager.default.contents(atPath: path)
+        }
+        return nil
+    }
+
+    static func profiles() -> [Profile] {
         let admins = Set((Shell.run("/usr/bin/dscl", [".", "-read", "/Groups/admin",
                                                       "GroupMembership"]) ?? "")
             .replacingOccurrences(of: "GroupMembership:", with: "")
@@ -145,11 +191,13 @@ enum SystemInfo {
             .filter { !$0.hasPrefix("_") && !["daemon", "nobody", "root"].contains($0) }
 
         return names.map { name in
-            let full = Shell.run("/usr/bin/id", ["-P", name])?
-                .split(separator: ":").dropFirst(7).first.map(String.init) ?? ""
-            let label = full.isEmpty ? name : "\(full) (\(name))"
-            return InfoRow(label: label,
-                           value: admins.contains(name) ? "Administrator" : "Standard")
+            Profile(shortName: name,
+                    fullName: dscl(name, "RealName") ?? name,
+                    isAdmin: admins.contains(name),
+                    home: dscl(name, "NFSHomeDirectory") ?? "—",
+                    shell: dscl(name, "UserShell") ?? "—",
+                    uid: dscl(name, "UniqueID") ?? "—",
+                    avatar: avatar(for: name))
         }
     }
 

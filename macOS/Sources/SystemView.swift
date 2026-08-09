@@ -8,7 +8,7 @@ struct SystemView: View {
     @State private var hardware: [InfoRow] = []
     @State private var os: [InfoRow] = []
     @State private var signedIn: [LoggedInUser] = []
-    @State private var accounts: [InfoRow] = []
+    @State private var profiles: [SystemInfo.Profile] = []
     @State private var updates: [SoftwareUpdate] = []
     @State private var loading = true
     @State private var checkingUpdates = false
@@ -34,26 +34,8 @@ struct SystemView: View {
                           trailing: checkedUpdates ? "\(updates.count) pending" : "")
             updatesCard
 
-            SectionHeader(title: "Signed in now", trailing: "\(signedIn.count)")
-            ForEach(signedIn) { u in userRow(u) }
-
-            SectionHeader(title: "All accounts", trailing: "\(accounts.count)")
-            ForEach(accounts) { a in
-                HStack {
-                    Image(systemName: a.value == "Administrator"
-                          ? "person.badge.key.fill" : "person.fill")
-                        .font(.system(size: 11))
-                        .foregroundStyle(a.value == "Administrator" ? Color.brand : Color.inkTertiary)
-                        .frame(width: 18)
-                    Text(a.label).font(.system(size: 12.5))
-                    Spacer()
-                    Text(a.value).font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(Color.inkSecondary)
-                }
-                .padding(.horizontal, 13).padding(.vertical, 8)
-                .glassSurface(radius: 10)
-                .padding(.bottom, 5)
-            }
+            SectionHeader(title: "Accounts", trailing: "\(profiles.count)")
+            ForEach(profiles) { p in accountCard(p) }
         }
         .onAppear { if hardware.isEmpty { load() } }
     }
@@ -172,36 +154,86 @@ struct SystemView: View {
         }
     }
 
-    private func userRow(_ u: LoggedInUser) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "person.crop.circle.fill")
-                .font(.system(size: 18)).foregroundStyle(Color.brand)
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 6) {
-                    Text(u.name).font(.system(size: 13, weight: .semibold))
-                    if u.isCurrent {
-                        Text("YOU").font(.system(size: 8.5, weight: .bold)).tracking(0.5)
-                            .padding(.horizontal, 5).padding(.vertical, 1.5)
-                            .background(Color.brand.opacity(0.16),
-                                        in: RoundedRectangle(cornerRadius: 4))
-                            .foregroundStyle(Color.brand)
-                    }
-                    if u.isAdmin {
-                        Text("ADMIN").font(.system(size: 8.5, weight: .bold)).tracking(0.5)
-                            .padding(.horizontal, 5).padding(.vertical, 1.5)
-                            .background(Color.riskRebuild.opacity(0.16),
-                                        in: RoundedRectangle(cornerRadius: 4))
-                            .foregroundStyle(Color.riskRebuild)
-                    }
+    private func accountCard(_ p: SystemInfo.Profile) -> some View {
+        let session = signedIn.first { $0.name == p.shortName }
+
+        return HStack(alignment: .top, spacing: 14) {
+            avatarView(p)
+
+            VStack(alignment: .leading, spacing: 5) {
+                HStack(spacing: 7) {
+                    Text(p.fullName.capitalized)
+                        .font(.system(size: 15, weight: .semibold))
+                    if p.shortName == NSUserName() { badge("YOU", .brand) }
+                    if p.isAdmin { badge("ADMIN", .riskRebuild) }
+                    if session != nil { badge("SIGNED IN", .riskSafe) }
                 }
-                Text("\(u.terminal) · since \(u.since)")
-                    .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
+
+                Text("@\(p.shortName)")
+                    .font(.system(size: 12)).foregroundStyle(Color.inkSecondary)
+
+                HStack(spacing: 16) {
+                    detail("Home", tilde(p.home))
+                    detail("Shell", (p.shell as NSString).lastPathComponent)
+                    detail("User ID", p.uid)
+                }
+                .padding(.top, 2)
+
+                if let session {
+                    Text("On \(session.terminal) since \(session.since)")
+                        .font(.system(size: 11)).foregroundStyle(Color.inkTertiary)
+                }
             }
-            Spacer()
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 13).padding(.vertical, 9)
-        .glassSurface(radius: 11)
-        .padding(.bottom, 6)
+        .padding(15)
+        .glassSurface(radius: 13)
+        .padding(.bottom, 8)
+    }
+
+    /// Account picture when macOS has one, otherwise initials on the brand
+    /// gradient — never an empty grey circle.
+    private func avatarView(_ p: SystemInfo.Profile) -> some View {
+        Group {
+            if let data = p.avatar, let image = NSImage(data: data) {
+                Image(nsImage: image).resizable().aspectRatio(contentMode: .fill)
+            } else {
+                LinearGradient(colors: [.brand, .brand2],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .overlay(
+                        Text(initials(p.fullName))
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(.white)
+                    )
+            }
+        }
+        .frame(width: 58, height: 58)
+        .clipShape(Circle())
+        .overlay(Circle().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1))
+        .shadow(color: .black.opacity(0.12), radius: 5, y: 2)
+    }
+
+    private func initials(_ name: String) -> String {
+        let parts = name.split(separator: " ").prefix(2)
+        let letters = parts.compactMap { $0.first }.map(String.init).joined()
+        return letters.isEmpty ? "?" : letters.uppercased()
+    }
+
+    private func badge(_ text: String, _ color: Color) -> some View {
+        Text(text).font(.system(size: 8.5, weight: .bold)).tracking(0.5)
+            .padding(.horizontal, 6).padding(.vertical, 2)
+            .background(color.opacity(0.16), in: RoundedRectangle(cornerRadius: 4))
+            .foregroundStyle(color)
+    }
+
+    private func detail(_ label: String, _ value: String) -> some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text(label.uppercased())
+                .font(.system(size: 8.5, weight: .semibold)).tracking(0.5)
+                .foregroundStyle(Color.inkTertiary)
+            Text(value).font(.system(size: 11, weight: .medium))
+                .lineLimit(1).truncationMode(.middle)
+        }
     }
 
     // ------------------------------------------------------------------
@@ -211,12 +243,12 @@ struct SystemView: View {
         Task {
             let result = await Task.detached(priority: .userInitiated) {
                 (SystemInfo.hardware(), SystemInfo.operatingSystem(),
-                 SystemInfo.users(), SystemInfo.allAccounts())
+                 SystemInfo.users(), SystemInfo.profiles())
             }.value
             hardware = result.0
             os = result.1
             signedIn = result.2
-            accounts = result.3
+            profiles = result.3
             loading = false
         }
     }
