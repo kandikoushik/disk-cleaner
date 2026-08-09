@@ -313,31 +313,39 @@ struct Card<Content: View>: View {
 // between tabs — the signature Liquid Glass motion — instead of cross-fading.
 // ---------------------------------------------------------------------------
 
+/// How much text the tab bar can afford at the current width.
+enum TabLabelMode {
+    case all        // every tab shows its name
+    case activeOnly // only the selected tab shows its name
+    case none       // icons only
+}
+
 struct GlassTabBar: View {
     @Binding var selection: Page
     @Namespace private var pillSpace
 
     var body: some View {
-        // Nine tabs cannot fit a narrow window. Try full labels first, then
-        // icon-only, and if even that overflows fall back to a horizontal
-        // scroller — so the bar never clips off the edge of the window.
+        // Give up text in stages rather than all at once: full labels, then
+        // the selected tab keeps its name while the rest fall back to icons,
+        // then icons only, and finally a scroller.
         ViewThatFits(in: .horizontal) {
-            bar(compact: false)
-            bar(compact: true)
+            bar(.all)
+            bar(.activeOnly)
+            bar(.none)
             ScrollView(.horizontal, showsIndicators: false) {
-                bar(compact: true).padding(.horizontal, 2)
+                bar(.activeOnly).padding(.horizontal, 2)
             }
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
     }
 
     @ViewBuilder
-    private func bar(compact: Bool) -> some View {
+    private func bar(_ mode: TabLabelMode) -> some View {
         if #available(macOS 26.0, *) {
             GlassEffectContainer(spacing: 6) {
                 HStack(spacing: 2) {
                     ForEach(Page.allCases) { page in
-                        tab(page, compact: compact)
+                        tab(page, mode: mode)
                             .background {
                                 if selection == page {
                                     Capsule()
@@ -356,7 +364,7 @@ struct GlassTabBar: View {
         } else {
             HStack(spacing: 2) {
                 ForEach(Page.allCases) { page in
-                    tab(page, compact: compact)
+                    tab(page, mode: mode)
                         .background {
                             if selection == page {
                                 Capsule().fill(Color.brand.opacity(0.18))
@@ -371,20 +379,30 @@ struct GlassTabBar: View {
         }
     }
 
-    private func tab(_ page: Page, compact: Bool) -> some View {
-        Button {
+    private func tab(_ page: Page, mode: TabLabelMode) -> some View {
+        let isActive = selection == page
+        let showsLabel: Bool = {
+            switch mode {
+            case .all:        return true
+            case .activeOnly: return isActive
+            case .none:       return false
+            }
+        }()
+
+        return Button {
             selection = page
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: page.icon).font(.system(size: 11, weight: .semibold))
-                if !compact {
+                if showsLabel {
                     Text(page.rawValue).font(.system(size: 12.5, weight: .medium))
                         .fixedSize()
+                        .transition(.opacity.combined(with: .scale(scale: 0.85)))
                 }
             }
-            .frame(minWidth: compact ? 30 : 84)
-            .padding(.horizontal, compact ? 7 : 9).padding(.vertical, 7)
-            .foregroundStyle(selection == page ? Color.primary : Color.secondary)
+            .frame(minWidth: showsLabel ? 84 : 30)
+            .padding(.horizontal, showsLabel ? 9 : 7).padding(.vertical, 7)
+            .foregroundStyle(isActive ? Color.primary : Color.secondary)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
