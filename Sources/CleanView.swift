@@ -93,7 +93,7 @@ struct CleanView: View {
     /// "Free" takes the neutral track colour and "System & other" a grey — only
     /// the user's own folders get categorical hues.
     private func compositionColor(_ name: String) -> Color {
-        if name == "Free" { return .track }
+        if name == "Free" { return .neutralFill }
         if name == "System & other" { return .secondary.opacity(0.55) }
         let ordered = app.composition.filter { $0.name != "Free" && $0.name != "System & other" }
         let idx = (ordered.firstIndex { $0.name == name } ?? 0) + 1
@@ -187,7 +187,7 @@ struct CleanView: View {
     // ---- list ---------------------------------------------------------------
 
     private var targetList: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        LazyVStack(alignment: .leading, spacing: 0) {
             if app.scanning {
                 ProgressView(value: app.scanProgress)
                     .progressViewStyle(.linear).tint(.brand)

@@ -26,6 +26,8 @@ extension Color {
 
     static let hairline = Color.dynamic(light: "e6eaf1", dark: "222a36")
     static let track    = Color.dynamic(light: "eaeef5", dark: "222a36")
+    /// Distinct from `track` so an unused/free segment still reads as a segment.
+    static let neutralFill = Color.dynamic(light: "d3dae6", dark: "2c3644")
     static let sunk     = Color.dynamic(light: "f7f9fc", dark: "0f141d")
 
     /// Categorical slot 1–8.
@@ -275,24 +277,33 @@ struct Backdrop: View {
             GeometryReader { geo in
                 let w = geo.size.width, h = geo.size.height
                 Circle()
-                    .fill(RadialGradient(colors: [.brand.opacity(0.55), .clear],
+                    .fill(RadialGradient(colors: [.brand.opacity(0.60), .clear],
                                          center: .center, startRadius: 0, endRadius: w * 0.55))
                     .frame(width: w * 1.1, height: w * 1.1)
-                    .position(x: w * 0.12, y: h * 0.04)
+                    .position(x: w * 0.10, y: h * 0.06)
                 Circle()
-                    .fill(RadialGradient(colors: [.brand2.opacity(0.5), .clear],
-                                         center: .center, startRadius: 0, endRadius: w * 0.5))
-                    .frame(width: w, height: w)
-                    .position(x: w * 0.95, y: h * 0.18)
+                    .fill(RadialGradient(colors: [.brand2.opacity(0.58), .clear],
+                                         center: .center, startRadius: 0, endRadius: w * 0.55))
+                    .frame(width: w * 1.1, height: w * 1.1)
+                    .position(x: w * 0.92, y: h * 0.10)
+                // Mid-right: without this the second chart card floats over bare
+                // background and the glass has nothing to bend.
                 Circle()
-                    .fill(RadialGradient(colors: [Color.series(3).opacity(0.3), .clear],
+                    .fill(RadialGradient(colors: [Color.series(7).opacity(0.34), .clear],
+                                         center: .center, startRadius: 0, endRadius: w * 0.42))
+                    .frame(width: w * 0.85, height: w * 0.85)
+                    .position(x: w * 0.72, y: h * 0.34)
+                Circle()
+                    .fill(RadialGradient(colors: [Color.series(3).opacity(0.32), .clear],
                                          center: .center, startRadius: 0, endRadius: w * 0.45))
                     .frame(width: w * 0.9, height: w * 0.9)
-                    .position(x: w * 0.5, y: h * 0.92)
+                    .position(x: w * 0.30, y: h * 0.78)
             }
-            .blur(radius: 34)
+            .blur(radius: 40)
+            .drawingGroup()          // rasterise once instead of per frame
         }
         .ignoresSafeArea()
+        .allowsHitTesting(false)
     }
 }
 
@@ -400,8 +411,8 @@ struct GlassTabBar: View {
                         .transition(.opacity.combined(with: .scale(scale: 0.85)))
                 }
             }
-            .frame(minWidth: showsLabel ? 84 : 30)
-            .padding(.horizontal, showsLabel ? 9 : 7).padding(.vertical, 7)
+            .frame(minWidth: showsLabel ? 0 : 30)
+            .padding(.horizontal, showsLabel ? 11 : 8).padding(.vertical, 7)
             .foregroundStyle(isActive ? Color.primary : Color.secondary)
             .contentShape(Capsule())
         }

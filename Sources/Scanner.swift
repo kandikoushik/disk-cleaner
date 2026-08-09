@@ -159,26 +159,40 @@ enum Paths {
         return out
     }
 
+    static let devRoots = [
+        "\(HOME)/Developer", "\(HOME)/Projects", "\(HOME)/Code",
+        "\(HOME)/WebstormProjects", "\(HOME)/src", "\(HOME)/Documents", "\(HOME)/Desktop"
+    ]
     static let github = "\(HOME)/Documents/Github"
 
-    /// Depth-limited search for directories with any of the given names.
+    /// Depth-limited search for directories with any of the given names across all developer roots.
     /// Matches are not descended into.
     static func findDirs(named names: Set<String>, under root: String, maxDepth: Int) -> [String] {
         let fm = FileManager.default
         var found: [String] = []
-        var frontier = [(root, 0)]
-        while let (dir, depth) = frontier.popLast() {
-            guard depth < maxDepth,
-                  let kids = try? fm.contentsOfDirectory(atPath: dir) else { continue }
-            for k in kids {
-                let full = (dir as NSString).appendingPathComponent(k)
-                var isDir: ObjCBool = false
-                guard fm.fileExists(atPath: full, isDirectory: &isDir), isDir.boolValue
-                else { continue }
-                if names.contains(k) {
-                    found.append(full)          // don't descend into a match
-                } else {
-                    frontier.append((full, depth + 1))
+        var rootsToSearch = [root]
+        for candidate in devRoots {
+            if fm.fileExists(atPath: candidate) && !rootsToSearch.contains(candidate) {
+                rootsToSearch.append(candidate)
+            }
+        }
+        
+        for r in rootsToSearch {
+            var frontier = [(r, 0)]
+            while let (dir, depth) = frontier.popLast() {
+                guard depth < maxDepth,
+                      let kids = try? fm.contentsOfDirectory(atPath: dir) else { continue }
+                for k in kids {
+                    if k.hasPrefix(".") || k == "Library" || k == "Applications" { continue }
+                    let full = (dir as NSString).appendingPathComponent(k)
+                    var isDir: ObjCBool = false
+                    guard fm.fileExists(atPath: full, isDirectory: &isDir), isDir.boolValue
+                    else { continue }
+                    if names.contains(k) {
+                        if !found.contains(full) { found.append(full) }
+                    } else {
+                        frontier.append((full, depth + 1))
+                    }
                 }
             }
         }
