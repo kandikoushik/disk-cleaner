@@ -19,7 +19,6 @@ struct CleanView: View {
         VStack(alignment: .leading, spacing: 10) {
             charts
             toolbar
-            filters
             chips
             targetList
         }
@@ -103,65 +102,101 @@ struct CleanView: View {
     // ---- toolbar ------------------------------------------------------------
 
     private var toolbar: some View {
-        HStack(spacing: 8) {
-            Button { Task { await app.scan(); await app.loadComposition() } } label: {
-                Label("Rescan", systemImage: "arrow.clockwise")
-            }
-            .disabled(app.scanning)
+        Card {
+            VStack(alignment: .leading, spacing: 12) {
+                // Top Row: Search, Sorting & Actions
+                HStack(spacing: 10) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(Color.brand)
+                            .font(.system(size: 12, weight: .bold))
+                        TextField("Search targets…", text: $app.search)
+                            .textFieldStyle(.plain)
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .padding(.horizontal, 11).padding(.vertical, 6)
+                    .glassSurface(radius: 8)
+                    .frame(maxWidth: 240)
 
-            Button { confirming = .quick } label: {
-                Label("Quick clean", systemImage: "bolt.fill")
-            }
-            .disabled(app.scanning || !app.states.contains { $0.target.risk == .safe && $0.hasContent })
-            .tint(.riskSafe)
+                    Picker("Sort", selection: $app.sort) {
+                        ForEach(SortMode.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .labelsHidden()
+                    .frame(width: 140)
 
-            HStack(spacing: 2) {
-                Button("Safe") { app.selectSafe() }
-                Button("All") { app.selectAllButPersonal() }
-                Button("Clear") { app.clearSelection() }
-            }
-            .glassCapsule()
+                    Spacer()
 
-            Spacer()
+                    Button { Task { await app.scan(); await app.loadComposition() } } label: {
+                        Label("Rescan", systemImage: "arrow.clockwise")
+                    }
+                    .glassButton()
+                    .disabled(app.scanning)
 
-            Button {
-                confirming = .selection
-            } label: {
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                    Text(app.selectedCount > 0
-                         ? "Clean \(app.selectedCount) · \(fmtBytes(app.selectedBytes))"
-                         : "Clean selected")
-                    .fontWeight(.bold)
+                    Button { confirming = .quick } label: {
+                        Label("Quick Clean", systemImage: "bolt.fill")
+                    }
+                    .glassButton()
+                    .disabled(app.scanning || !app.states.contains { $0.target.risk == .safe && $0.hasContent })
+
+                    Button("Copy Report") { app.copyReport() }
+                        .glassButton()
                 }
-                .padding(.horizontal, 14).padding(.vertical, 7)
-            }
-            .glassButton(prominent: true)
-            .tint(app.selectionHasReview ? .riskReview : .brand)
-            .disabled(app.selectedCount == 0 || app.scanning)
-        }
-    }
 
-    private var filters: some View {
-        HStack(spacing: 8) {
-            HStack(spacing: 6) {
-                Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
-                    .font(.system(size: 11))
-                TextField("Search targets…", text: $app.search)
-                    .textFieldStyle(.plain)
-                    .font(.system(size: 12.5))
-            }
-            .padding(.horizontal, 11).padding(.vertical, 7)
-            .glassSurface(radius: 9)
-            .frame(width: 220)
+                Divider()
 
-            Picker("", selection: $app.sort) {
-                ForEach(SortMode.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .labelsHidden().frame(width: 150)
+                // Bottom Row: Selection Pill (Safe | All | Clear) & Elevated Clean CTA Button
+                HStack(spacing: 12) {
+                    HStack(spacing: 0) {
+                        Button("Safe") { app.selectSafe() }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14).padding(.vertical, 6)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(Color.riskSafe)
 
-            Spacer()
-            Button("Copy report") { app.copyReport() }.glassButton()
+                        Divider().frame(height: 14)
+
+                        Button("All") { app.selectAllButPersonal() }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14).padding(.vertical, 6)
+                            .font(.system(size: 12, weight: .semibold))
+
+                        Divider().frame(height: 14)
+
+                        Button("Clear") { app.clearSelection() }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal, 14).padding(.vertical, 6)
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
+                    .background(Color.sunk, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.hairline))
+
+                    Spacer()
+
+                    Button {
+                        confirming = .selection
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 12, weight: .bold))
+                            Text(app.selectedCount > 0
+                                 ? "Clean \(app.selectedCount) · \(fmtBytes(app.selectedBytes))"
+                                 : "Clean Selected")
+                                .font(.system(size: 13, weight: .bold))
+                        }
+                        .padding(.horizontal, 18).padding(.vertical, 7)
+                        .background(
+                            app.selectedCount > 0
+                                ? LinearGradient(colors: [.brand, .brand2], startPoint: .leading, endPoint: .trailing)
+                                : LinearGradient(colors: [Color.secondary.opacity(0.18), Color.secondary.opacity(0.12)], startPoint: .leading, endPoint: .trailing),
+                            in: Capsule()
+                        )
+                        .foregroundStyle(app.selectedCount > 0 ? Color.white : Color.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(app.selectedCount == 0 || app.scanning)
+                }
+            }
         }
     }
 
@@ -320,6 +355,7 @@ struct TargetRow: View {
     let onCleanOne: () -> Void
 
     private var isOpen: Bool { app.expanded.contains(state.id) }
+    @State private var picked: Set<String> = []
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -373,39 +409,165 @@ struct TargetRow: View {
         .opacity(state.busy ? 0.55 : 1)
     }
 
+    // ------------------------------------------------------------------
+    // Expanded contents
+    //
+    // Was a wall of monospaced paths. A path is not what you recognise a file
+    // by — the name is. Name leads, location is secondary, and per-row
+    // selection means you can clear several without hunting one X at a time.
+    // ------------------------------------------------------------------
+
     private var pathList: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: 0) {
             if let entries = app.pathsFor[state.id] {
                 if entries.isEmpty {
-                    Text("(runs a command — no direct path list)")
-                        .font(.system(size: 11, design: .monospaced))
+                    Text("Runs a command — there is no direct file list to show.")
+                        .font(.system(size: 11.5))
                         .foregroundStyle(.secondary)
-                }
-                ForEach(entries) { e in
-                    HStack(spacing: 8) {
-                        Text(tilde(e.path)).font(.system(size: 10.5, design: .monospaced))
-                            .foregroundStyle(.secondary).lineLimit(1).truncationMode(.middle)
-                        Spacer(minLength: 6)
-                        Text(fmtBytes(e.size)).font(.system(size: 10.5, design: .monospaced))
-                            .monospacedDigit()
-                        Button { Explore.reveal(e.path) } label: {
-                            Image(systemName: "folder")
-                        }.buttonStyle(.borderless).help("Reveal in Finder")
-                        Button { Task { await app.deletePath(e, in: state.id) } } label: {
-                            Image(systemName: "xmark.circle.fill").foregroundStyle(.red)
-                        }.buttonStyle(.borderless).help("Delete just this")
+                        .padding(.vertical, 6)
+                } else {
+                    pathHeader(entries)
+                    Divider().opacity(0.5)
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(entries.enumerated()), id: \.element.id) { i, e in
+                                pathRow(e, striped: i.isMultiple(of: 2))
+                            }
+                        }
                     }
+                    .frame(maxHeight: entries.count > 8 ? 260 : .infinity)
                 }
             } else {
-                HStack(spacing: 6) {
+                HStack(spacing: 7) {
                     ProgressView().controlSize(.small)
-                    Text("reading…").font(.system(size: 11)).foregroundStyle(.secondary)
+                    Text("Reading contents…").font(.system(size: 11.5))
+                        .foregroundStyle(.secondary)
                 }
+                .padding(.vertical, 8)
             }
         }
-        .padding(9)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(Color.sunk))
+        .background(RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .fill(Color.primary.opacity(0.035)))
+        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+            .strokeBorder(Color.primary.opacity(0.07)))
+    }
+
+    private func pathHeader(_ entries: [PathEntry]) -> some View {
+        HStack(spacing: 8) {
+            Text("\(entries.count) item\(entries.count == 1 ? "" : "s")")
+                .font(.system(size: 11, weight: .semibold))
+            Text(fmtBytes(entries.reduce(0) { $0 + $1.size }))
+                .font(.system(size: 11, weight: .semibold)).monospacedDigit()
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            if !picked.isEmpty {
+                Text("\(picked.count) selected")
+                    .font(.system(size: 10.5)).foregroundStyle(.secondary)
+                Button {
+                    let doomed = entries.filter { picked.contains($0.path) }
+                    picked.removeAll()
+                    Task { for e in doomed { await app.deletePath(e, in: state.id) } }
+                } label: {
+                    Text("Delete selected").font(.system(size: 10.5, weight: .semibold))
+                }
+                .buttonStyle(.borderless).foregroundStyle(Color.riskReview)
+                Button("Clear") { picked.removeAll() }
+                    .buttonStyle(.borderless).font(.system(size: 10.5))
+            } else {
+                Button {
+                    picked = Set(entries.map(\.path))
+                } label: {
+                    Text("Select all").font(.system(size: 10.5))
+                }
+                .buttonStyle(.borderless)
+            }
+        }
+        .padding(.bottom, 7)
+    }
+
+    private func pathRow(_ e: PathEntry, striped: Bool) -> some View {
+        let isPicked = picked.contains(e.path)
+        let name = (e.path as NSString).lastPathComponent
+        let folder = tilde((e.path as NSString).deletingLastPathComponent)
+
+        return HStack(spacing: 9) {
+            Toggle("", isOn: Binding(
+                get: { isPicked },
+                set: { on in if on { picked.insert(e.path) } else { picked.remove(e.path) } }
+            ))
+            .labelsHidden().toggleStyle(.checkbox)
+
+            Image(systemName: Self.icon(for: e.path))
+                .font(.system(size: 12))
+                .foregroundStyle(Self.tint(for: e.path))
+                .frame(width: 16)
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(name)
+                    .font(.system(size: 11.5, weight: .medium))
+                    .lineLimit(1).truncationMode(.middle)
+                Text(folder)
+                    .font(.system(size: 10)).foregroundStyle(.tertiary)
+                    .lineLimit(1).truncationMode(.head)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(fmtBytes(e.size))
+                .font(.system(size: 11, weight: .semibold)).monospacedDigit()
+                .foregroundStyle(.secondary)
+
+            Button { Explore.reveal(e.path) } label: {
+                Image(systemName: "magnifyingglass").font(.system(size: 10.5))
+            }
+            .buttonStyle(.borderless).help("Reveal in Finder")
+
+            Button { Task { await app.deletePath(e, in: state.id) } } label: {
+                Image(systemName: "trash").font(.system(size: 10.5))
+            }
+            .buttonStyle(.borderless).foregroundStyle(Color.riskReview)
+            .help("Delete this one")
+        }
+        .padding(.horizontal, 7).padding(.vertical, 5)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(isPicked ? Color.brand.opacity(0.12)
+                               : (striped ? Color.primary.opacity(0.025) : .clear))
+        )
+    }
+
+    /// Recognisable at a glance beats reading a file extension.
+    private static func icon(for path: String) -> String {
+        var isDir: ObjCBool = false
+        FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+        if isDir.boolValue { return "folder.fill" }
+        switch (path as NSString).pathExtension.lowercased() {
+        case "dmg", "iso":                  return "opticaldiscdrive.fill"
+        case "pkg", "mpkg":                 return "shippingbox.fill"
+        case "zip", "gz", "tar", "bz2":     return "doc.zipper"
+        case "png", "jpg", "jpeg", "heic", "gif": return "photo.fill"
+        case "mp4", "mov", "avi", "mkv":    return "film.fill"
+        case "log", "txt":                  return "doc.text.fill"
+        case "app":                         return "app.fill"
+        default:                            return "doc.fill"
+        }
+    }
+
+    private static func tint(for path: String) -> Color {
+        var isDir: ObjCBool = false
+        FileManager.default.fileExists(atPath: path, isDirectory: &isDir)
+        if isDir.boolValue { return .series(1) }
+        switch (path as NSString).pathExtension.lowercased() {
+        case "dmg", "iso", "pkg", "mpkg":   return .series(2)
+        case "zip", "gz", "tar", "bz2":     return .series(4)
+        case "png", "jpg", "jpeg", "heic", "gif": return .series(5)
+        case "mp4", "mov", "avi", "mkv":    return .series(7)
+        default:                            return .secondary
+        }
     }
 
     private func toggleOpen() {

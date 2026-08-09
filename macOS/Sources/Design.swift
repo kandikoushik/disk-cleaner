@@ -270,58 +270,40 @@ extension View {
 
 /// Soft colour field behind the whole window. Without this the glass has
 /// nothing to bend and looks like a flat card.
-/// 3D Parallax & Animated Backdrop with spatial rotation & dynamic lighting
+/// Refined Apple Liquid Glass Backdrop. Provides ambient gradient depth for glass surfaces
+/// without continuous background motion distraction.
 struct Backdrop: View {
     @EnvironmentObject var app: AppState
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [Color.black.opacity(0.85), Color(nsColor: .windowBackgroundColor).opacity(0.9)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
+            Rectangle().fill(Color(nsColor: .windowBackgroundColor))
 
-            TimelineView(.animation) { timeline in
-                let t = timeline.date.timeIntervalSince1970
+            GeometryReader { geo in
+                let w = geo.size.width, h = geo.size.height
                 let (c1, c2, c3) = app.theme.colors
 
-                GeometryReader { geo in
-                    let w = geo.size.width, h = geo.size.height
-                    let offsetX1 = sin(t * 0.6) * 60
-                    let offsetY1 = cos(t * 0.5) * 45
+                ZStack {
+                    Circle()
+                        .fill(RadialGradient(colors: [c1.opacity(0.18), .clear],
+                                             center: .center, startRadius: 0, endRadius: w * 0.55))
+                        .frame(width: w * 1.1, height: w * 1.1)
+                        .position(x: w * 0.10, y: h * 0.06)
 
-                    let offsetX2 = cos(t * 0.7) * 70
-                    let offsetY2 = sin(t * 0.6) * 55
+                    Circle()
+                        .fill(RadialGradient(colors: [c2.opacity(0.15), .clear],
+                                             center: .center, startRadius: 0, endRadius: w * 0.55))
+                        .frame(width: w * 1.1, height: w * 1.1)
+                        .position(x: w * 0.92, y: h * 0.10)
 
-                    let offsetX3 = sin(t * 0.4) * 50
-                    let rotAngle = sin(t * 0.3) * 20
-
-                    ZStack {
-                        // 3D Rotated Primary Ambient Mesh
-                        RoundedRectangle(cornerRadius: 180, style: .continuous)
-                            .fill(RadialGradient(colors: [c1.opacity(0.80), c1.opacity(0.1), .clear],
-                                                 center: .center, startRadius: 10, endRadius: w * 0.45))
-                            .frame(width: w * 0.9, height: w * 0.9)
-                            .rotation3DEffect(.degrees(rotAngle), axis: (x: 1, y: 0.5, z: 0.2))
-                            .position(x: w * 0.20 + offsetX1, y: h * 0.15 + offsetY1)
-
-                        // 3D Rotated Secondary Glow Mesh
-                        RoundedRectangle(cornerRadius: 200, style: .continuous)
-                            .fill(RadialGradient(colors: [c2.opacity(0.75), c2.opacity(0.1), .clear],
-                                                 center: .center, startRadius: 10, endRadius: w * 0.50))
-                            .frame(width: w * 0.85, height: w * 0.85)
-                            .rotation3DEffect(.degrees(-rotAngle * 1.2), axis: (x: 0.3, y: 1, z: 0.5))
-                            .position(x: w * 0.85 + offsetX2, y: h * 0.25 + offsetY2)
-
-                        // 3D Floating Particle Sphere
-                        Circle()
-                            .fill(RadialGradient(colors: [c3.opacity(0.65), .clear],
-                                                 center: .center, startRadius: 0, endRadius: w * 0.35))
-                            .frame(width: w * 0.7, height: w * 0.7)
-                            .rotation3DEffect(.degrees(rotAngle * 1.5), axis: (x: 0.8, y: 0.2, z: 1))
-                            .position(x: w * 0.50 + offsetX3, y: h * 0.70)
-                    }
+                    Circle()
+                        .fill(RadialGradient(colors: [c3.opacity(0.10), .clear],
+                                             center: .center, startRadius: 0, endRadius: w * 0.45))
+                        .frame(width: w * 0.9, height: w * 0.9)
+                        .position(x: w * 0.40, y: h * 0.70)
                 }
             }
-            .blur(radius: 24)
+            .blur(radius: 45)
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
@@ -364,73 +346,8 @@ struct BreadcrumbsView: View {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Animated Character Mascot ("CleanBot") & Interactive Cards
-// ---------------------------------------------------------------------------
-
-enum MascotMood {
-    case happy, scanning, celebrate, protective
-}
-
-struct MascotView: View {
-    var mood: MascotMood = .happy
-    var speechBubble: String = ""
-    @State private var isBouncing = false
-
-    var moodEmoji: String {
-        switch mood {
-        case .happy: return "🤖"
-        case .scanning: return "🔍"
-        case .celebrate: return "🎉"
-        case .protective: return "🛡️"
-        }
-    }
-
-    var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.brand.opacity(0.20))
-                    .frame(width: 44, height: 44)
-                    .blur(radius: 6)
-
-                Circle()
-                    .fill(Color.brand.opacity(0.12))
-                    .frame(width: 40, height: 40)
-                    .overlay(
-                        Circle().strokeBorder(Color.brand.opacity(0.5), lineWidth: 1)
-                    )
-
-                Text(moodEmoji)
-                    .font(.system(size: 22))
-                    .scaleEffect(isBouncing ? 1.12 : 0.96)
-                    .offset(y: isBouncing ? -2 : 2)
-            }
-            .onAppear {
-                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                    isBouncing = true
-                }
-            }
-
-            if !speechBubble.isEmpty {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("CleanBot Assistant")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.brand)
-                    Text(speechBubble)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(.primary)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 7)
-                .glassCapsule()
-            }
-        }
-    }
-}
-
-/// Redesigned Interactive Card with spring elevation, hover feedback & specular highlight
-struct InteractiveCard<Content: View>: View {
+/// Refined Liquid Glass Card Component
+struct Card<Content: View>: View {
     var radius: CGFloat = 14
     @State private var isHovered = false
     @ViewBuilder var content: Content
@@ -439,18 +356,8 @@ struct InteractiveCard<Content: View>: View {
         content
             .padding(16)
             .glassSurface(radius: radius, selected: isHovered)
-            .scaleEffect(isHovered ? 1.012 : 1.0)
-            .shadow(color: isHovered ? Color.brand.opacity(0.25) : Color.clear, radius: isHovered ? 12 : 0)
-            .animation(.spring(response: 0.3, dampingFraction: 0.75), value: isHovered)
+            .animation(.easeInOut(duration: 0.15), value: isHovered)
             .onHover { h in isHovered = h }
-    }
-}
-
-struct Card<Content: View>: View {
-    var radius: CGFloat = 14
-    @ViewBuilder var content: Content
-    var body: some View {
-        InteractiveCard(radius: radius) { content }
     }
 }
 

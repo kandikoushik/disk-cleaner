@@ -97,18 +97,12 @@ struct ContentView: View {
                       label: fmtBytes(app.disk.free),
                       caption: "FREE")
 
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Disk Cleaner")
-                            .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
-                        Text(tagline)
-                            .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.85))
-                    }
-                    Spacer()
-                    MascotView(mood: mascotMood, speechBubble: mascotMessage)
-                }
-                .padding(.bottom, 6)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Disk Cleaner")
+                    .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+                Text(tagline)
+                    .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.85))
+                    .padding(.bottom, 12)
 
                 // Four across when there is room, otherwise two rows.
                 ViewThatFits(in: .horizontal) {
@@ -133,18 +127,6 @@ struct ContentView: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 18, style: .continuous)
         )
-    }
-
-    private var mascotMood: MascotMood {
-        if app.scanning { return .scanning }
-        if app.selectedBytes > 0 { return .celebrate }
-        return .happy
-    }
-
-    private var mascotMessage: String {
-        if app.scanning { return "Scanning your developer targets..." }
-        if app.selectedBytes > 0 { return "Ready to reclaim \(fmtBytes(app.selectedBytes))!" }
-        return "Your Mac is running smoothly ✨"
     }
 
     @ViewBuilder
