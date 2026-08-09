@@ -318,11 +318,26 @@ struct GlassTabBar: View {
     @Namespace private var pillSpace
 
     var body: some View {
+        // Nine tabs cannot fit a narrow window. Try full labels first, then
+        // icon-only, and if even that overflows fall back to a horizontal
+        // scroller — so the bar never clips off the edge of the window.
+        ViewThatFits(in: .horizontal) {
+            bar(compact: false)
+            bar(compact: true)
+            ScrollView(.horizontal, showsIndicators: false) {
+                bar(compact: true).padding(.horizontal, 2)
+            }
+        }
+        .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
+    }
+
+    @ViewBuilder
+    private func bar(compact: Bool) -> some View {
         if #available(macOS 26.0, *) {
             GlassEffectContainer(spacing: 6) {
                 HStack(spacing: 2) {
                     ForEach(Page.allCases) { page in
-                        tab(page)
+                        tab(page, compact: compact)
                             .background {
                                 if selection == page {
                                     Capsule()
@@ -338,11 +353,10 @@ struct GlassTabBar: View {
                 .glassEffect(.regular, in: Capsule())
             }
             .fixedSize()
-            .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
         } else {
             HStack(spacing: 2) {
                 ForEach(Page.allCases) { page in
-                    tab(page)
+                    tab(page, compact: compact)
                         .background {
                             if selection == page {
                                 Capsule().fill(Color.brand.opacity(0.18))
@@ -353,25 +367,28 @@ struct GlassTabBar: View {
             .padding(4)
             .background(Capsule().fill(Color.sunk))
             .overlay(Capsule().strokeBorder(Color.hairline))
-            .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
+            .fixedSize()
         }
     }
 
-    private func tab(_ page: Page) -> some View {
+    private func tab(_ page: Page, compact: Bool) -> some View {
         Button {
             selection = page
         } label: {
             HStack(spacing: 5) {
                 Image(systemName: page.icon).font(.system(size: 11, weight: .semibold))
-                Text(page.rawValue).font(.system(size: 12.5, weight: .medium))
-                    .fixedSize()
+                if !compact {
+                    Text(page.rawValue).font(.system(size: 12.5, weight: .medium))
+                        .fixedSize()
+                }
             }
-            .frame(minWidth: 96)
-            .padding(.horizontal, 10).padding(.vertical, 7)
+            .frame(minWidth: compact ? 30 : 84)
+            .padding(.horizontal, compact ? 7 : 9).padding(.vertical, 7)
             .foregroundStyle(selection == page ? Color.primary : Color.secondary)
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
+        .help(page.rawValue)
     }
 }
 

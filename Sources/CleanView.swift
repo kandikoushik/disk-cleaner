@@ -37,7 +37,16 @@ struct CleanView: View {
     // ---- charts -------------------------------------------------------------
 
     private var charts: some View {
-        HStack(alignment: .top, spacing: 10) {
+        // Side by side when there is room; stacked once the window narrows.
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 10) { chartCards }
+            VStack(alignment: .leading, spacing: 10) { chartCards }
+        }
+    }
+
+    @ViewBuilder
+    private var chartCards: some View {
+        Group {
             Card {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Reclaimable by category")

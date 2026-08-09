@@ -8,7 +8,7 @@ struct DiskCleanerApp: App {
         Window("Disk Cleaner", id: "main") {
             ContentView()
                 .environmentObject(app)
-                .frame(minWidth: 720, minHeight: 520)
+                .frame(minWidth: 560, minHeight: 480)
                 .onAppear { app.start() }
         }
         .defaultSize(width: 940, height: 800)
@@ -67,7 +67,7 @@ struct ContentView: View {
                     }
                 }
                 .padding(20)
-                .frame(maxWidth: 980)
+                .frame(maxWidth: 980, alignment: .leading)
                 .frame(maxWidth: .infinity)
             }
 
@@ -93,11 +93,19 @@ struct ContentView: View {
                     .font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.85))
                     .padding(.bottom, 12)
 
-                HStack(spacing: 8) {
-                    pill(fmtBytes(app.disk.total), "capacity")
-                    pill(fmtBytes(app.reclaimable), "reclaimable")
-                    pill(fmtBytes(app.selectedBytes), "selected")
-                    pill(fmtBytes(app.freeAfter), "free after")
+                // Four across when there is room, otherwise two rows.
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 8) { heroPills }
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            pill(fmtBytes(app.disk.total), "capacity")
+                            pill(fmtBytes(app.reclaimable), "reclaimable")
+                        }
+                        HStack(spacing: 8) {
+                            pill(fmtBytes(app.selectedBytes), "selected")
+                            pill(fmtBytes(app.freeAfter), "free after")
+                        }
+                    }
                 }
             }
             Spacer(minLength: 0)
@@ -108,6 +116,14 @@ struct ContentView: View {
                            startPoint: .topLeading, endPoint: .bottomTrailing),
             in: RoundedRectangle(cornerRadius: 18, style: .continuous)
         )
+    }
+
+    @ViewBuilder
+    private var heroPills: some View {
+        pill(fmtBytes(app.disk.total), "capacity")
+        pill(fmtBytes(app.reclaimable), "reclaimable")
+        pill(fmtBytes(app.selectedBytes), "selected")
+        pill(fmtBytes(app.freeAfter), "free after")
     }
 
     private var tagline: String {
