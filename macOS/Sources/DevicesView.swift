@@ -5,17 +5,25 @@ struct DevicesView: View {
     @StateObject private var watcher = DeviceWatcher()
     @State private var busy: String?
     @State private var scanned: [String: [FolderEntry]] = [:]
+    @State private var account = AccountInfo(appleID: nil, displayName: nil)
+    @State private var known: [KnownDevice] = []
+    @State private var avatarData: Data?
+    @State private var machineModel = "Mac"
+    @State private var osVersion = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            profileCard
+
             HStack {
                 Button { watcher.refresh() } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label("Refresh Devices", systemImage: "arrow.clockwise")
                 }
                 Spacer()
                 Text("Plug something in and it appears here automatically")
                     .font(.system(size: 11)).foregroundStyle(Color.inkTertiary)
             }
+            .padding(.bottom, 10)
 
             if watcher.devices.isEmpty {
                 emptyState
@@ -24,8 +32,104 @@ struct DevicesView: View {
                     card(device)
                 }
             }
+
+            knownSection
         }
-        .onAppear { watcher.start { _ in } }
+        .onAppear {
+            watcher.start { _ in }
+            loadAccount()
+        }
+    }
+
+    /// Account card.
+    ///
+    /// Every value here is read from the machine. An earlier version of this
+    /// card hardcoded "MacBook Pro" (this is a Mac mini), "Apple ID Verified"
+    /// (nothing was verified) and "Family Sharing: Active (3 Family Members)" —
+    /// which no API can report. Inventing plausible-looking system facts is
+    /// worse than omitting them, because a user cannot tell the difference.
+    private var profileCard: some View {
+        Card {
+            HStack(spacing: 16) {
+                Group {
+                    if let data = avatarData, let image = NSImage(data: data) {
+                        Image(nsImage: image).resizable().aspectRatio(contentMode: .fill)
+                    } else {
+                        LinearGradient(colors: [.brand, .brand2],
+                                       startPoint: .topLeading, endPoint: .bottomTrailing)
+                            .overlay(Image(systemName: "person.fill")
+                                .font(.system(size: 22)).foregroundStyle(.white))
+                    }
+                }
+                .frame(width: 54, height: 54)
+                .clipShape(Circle())
+                .overlay(Circle().strokeBorder(Color.primary.opacity(0.12)))
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(NSFullUserName().isEmpty ? NSUserName() : NSFullUserName().capitalized)
+                        .font(.system(size: 15, weight: .bold))
+
+                    if let id = account.appleID {
+                        HStack(spacing: 6) {
+                            Image(systemName: "icloud.fill")
+                                .font(.system(size: 10)).foregroundStyle(Color.brand)
+                            Text(id).font(.system(size: 12))
+                                .foregroundStyle(Color.inkSecondary)
+                        }
+                    } else {
+                        Text("No Apple ID signed in on this Mac")
+                            .font(.system(size: 12)).foregroundStyle(Color.inkSecondary)
+                    }
+
+                    Text("\(machineModel) · macOS \(osVersion)")
+                        .font(.system(size: 11.5)).foregroundStyle(Color.inkTertiary)
+                }
+                Spacer()
+            }
+        }
+        .padding(.bottom, 10)
+    }
+
+    /// Devices this Mac knows about but that are not plugged in right now.
+    private var knownSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            SectionHeader(title: "Known devices", trailing: "\(known.count)")
+            if known.isEmpty {
+                Text("Nothing paired or backed up on this Mac.")
+                    .font(.system(size: 12)).foregroundStyle(Color.inkSecondary)
+                    .padding(.vertical, 12)
+            }
+            ForEach(known) { d in
+                HStack(spacing: 12) {
+                    Image(systemName: d.icon)
+                        .font(.system(size: 16)).foregroundStyle(Color.brand)
+                        .frame(width: 26)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(d.name).font(.system(size: 13, weight: .medium))
+                        Text(d.detail).font(.system(size: 11))
+                            .foregroundStyle(Color.inkSecondary)
+                    }
+                    Spacer()
+                    Text(d.via).font(.system(size: 10, weight: .medium))
+                        .padding(.horizontal, 7).padding(.vertical, 2.5)
+                        .background(Color.primary.opacity(0.06), in: Capsule())
+                        .foregroundStyle(Color.inkSecondary)
+                }
+                .padding(.horizontal, 13).padding(.vertical, 9)
+                .glassSurface(radius: 11)
+                .padding(.bottom, 6)
+            }
+
+            // Say what cannot be known, rather than filling the gap with a guess.
+            Text("Apple provides no API for the devices attached to an Apple ID, and "
+                 + "none for Family Sharing — that data is reachable only from Apple's "
+                 + "own apps and appleid.apple.com. The list above is what this Mac can "
+                 + "actually see: Bluetooth pairings, local backups, and development "
+                 + "pairings.")
+                .font(.system(size: 10.5)).foregroundStyle(Color.inkTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 6)
+        }
     }
 
     private var emptyState: some View {
@@ -149,6 +253,22 @@ struct DevicesView: View {
     }
 
     // ------------------------------------------------------------------
+
+    private func loadAccount() {
+        Task {
+            let result = await Task.detached(priority: .utility) {
+                (Devices.account(), Devices.known(),
+                 SystemInfo.avatar(for: NSUserName()),
+                 SystemInfo.hardware().first { $0.label == "Model" }?.value ?? "Mac")
+            }.value
+            account = result.0
+            known = result.1
+            avatarData = result.2
+            machineModel = result.3
+            let v = ProcessInfo.processInfo.operatingSystemVersion
+            osVersion = "\(v.majorVersion).\(v.minorVersion).\(v.patchVersion)"
+        }
+    }
 
     private func scanVolume(_ d: ConnectedDevice) {
         guard let root = d.path else { return }

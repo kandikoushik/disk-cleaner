@@ -19,6 +19,8 @@ enum MobileTab: String, CaseIterable, Identifiable {
     case shredder = "Shredder"
     case maintenance = "Maintenance"
     case settings = "Settings"
+    case devices = "Devices"
+    case system = "System"
 
     var id: String { rawValue }
 
@@ -33,6 +35,8 @@ enum MobileTab: String, CaseIterable, Identifiable {
         case .shredder: return "xmark.bin.fill"
         case .maintenance: return "wrench.and.screwdriver.fill"
         case .settings: return "gearshape.fill"
+        case .devices: return "cable.connector"
+        case .system: return "laptopcomputer"
         }
     }
 }
@@ -79,6 +83,8 @@ struct MainTabView: View {
                         case .shredder: MobileShredderView()
                         case .maintenance: MobileMaintenanceView()
                         case .settings: MobileSettingsView()
+                        case .devices: MobileDevicesView()
+                        case .system: MobileSystemView()
                         }
 
                         // Non-removable mandatory footer
@@ -230,6 +236,81 @@ struct MobileSettingsView: View {
                 Toggle("Move items to Recently Deleted", isOn: .constant(true))
                 Text("Theme: iOS Dynamic Liquid Glass")
                     .font(.caption).foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+// 10. Devices View
+struct MobileDevicesView: View {
+    var body: some View {
+        MobileCard(title: "Connected Devices & Accessories", subtitle: "USB & Wireless peripherals") {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Image(systemName: "laptopcomputer")
+                        .font(.title2).foregroundColor(.blue)
+                    VStack(alignment: .leading) {
+                        Text("Kandi's Mac mini").font(.subheadline.bold())
+                        Text("Connected via AirDrop & USB-C").font(.caption).foregroundColor(.secondary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 11. System View (Matching macOS System Page exactly!)
+struct MobileSystemView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            // Hardware Specs
+            MobileCard(title: "THIS DEVICE · HARDWARE", subtitle: "Hardware Diagnostics") {
+                VStack(spacing: 8) {
+                    TargetRowItem(title: "Model", size: "iPhone 16 Pro Max")
+                    TargetRowItem(title: "Chip", size: "Apple A18 Pro")
+                    TargetRowItem(title: "Cores", size: "6 (2 Perf + 4 Eff)")
+                    TargetRowItem(title: "Memory", size: "8 GB Unified")
+                    TargetRowItem(title: "Storage", size: "50 GB free of 256 GB")
+                }
+            }
+
+            // Operating System Specs
+            MobileCard(title: "OPERATING SYSTEM", subtitle: "iOS Release & Kernel") {
+                VStack(spacing: 8) {
+                    TargetRowItem(title: "iOS Version", size: "26.5.2")
+                    TargetRowItem(title: "Build", size: "25F84")
+                    TargetRowItem(title: "Uptime", size: "2d 20h")
+                    TargetRowItem(title: "Power", size: "Battery (92% Charged)")
+                }
+            }
+
+            // iOS Updates
+            MobileCard(title: "IOS UPDATES", subtitle: "Apple Update Service") {
+                HStack {
+                    Text("System is up to date").font(.caption).foregroundColor(.secondary)
+                    Spacer()
+                    Button("Check now") { }.buttonStyle(.bordered)
+                }
+            }
+
+            // User Account Info Card
+            MobileCard(title: "ACCOUNTS", subtitle: "Active Apple ID Account") {
+                HStack(spacing: 14) {
+                    ZStack {
+                        Circle().fill(Color.blue).frame(width: 50, height: 50)
+                        Text("👤").font(.title)
+                    }
+                    VStack(alignment: .leading, spacing: 3) {
+                        HStack(spacing: 6) {
+                            Text("Kandi Koushik").font(.headline)
+                            Text("YOU").font(.caption2).bold().padding(.horizontal, 4).padding(.vertical, 2).background(Color.blue.opacity(0.2)).cornerRadius(4)
+                            Text("ADMIN").font(.caption2).bold().padding(.horizontal, 4).padding(.vertical, 2).background(Color.orange.opacity(0.2)).cornerRadius(4)
+                            Text("SIGNED IN").font(.caption2).bold().padding(.horizontal, 4).padding(.vertical, 2).background(Color.green.opacity(0.2)).cornerRadius(4)
+                        }
+                        Text("@kandikoushik").font(.caption).foregroundColor(.secondary)
+                        Text("USER ID: 501 · On console since Aug 6 19:17").font(.caption2).foregroundColor(.secondary)
+                    }
+                }
             }
         }
     }

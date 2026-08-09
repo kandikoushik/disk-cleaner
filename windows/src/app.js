@@ -136,6 +136,75 @@ function renderView() {
         </div>
       </div>
     `;
+  } else if (currentTab === 'devices') {
+    title.innerText = 'Connected Devices & External Disks';
+    content.innerHTML = `
+      <div class="target-row">
+        <div>
+          <div style="font-weight: 600;">💻 Kandi's Mac mini</div>
+          <div style="font-size: 12px; color: var(--text-muted);">Connected via Network Share / USB OTG</div>
+        </div>
+        <button class="btn-primary" onclick="alert('Device connected!')">Explore Files</button>
+      </div>
+    `;
+  } else if (currentTab === 'system') {
+    title.innerText = 'System Diagnostics & User Profile';
+    content.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <!-- THIS PC HARDWARE -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">THIS PC · HARDWARE</div>
+            <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div><strong>Model:</strong> Windows PC Workstation</div>
+              <div><strong>Identifier:</strong> Win11,x64</div>
+              <div><strong>Chip:</strong> x64 Multi-Core CPU</div>
+              <div><strong>Cores:</strong> 16 Cores</div>
+              <div><strong>Memory:</strong> 16 GB System RAM</div>
+              <div><strong>Storage:</strong> 50 GB free of 228 GB</div>
+            </div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border);">
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">OPERATING SYSTEM</div>
+            <div style="font-size: 12px; display: flex; flex-direction: column; gap: 6px;">
+              <div><strong>OS:</strong> Windows 11 Pro</div>
+              <div><strong>Build:</strong> 22631.3880</div>
+              <div><strong>Kernel:</strong> 10.0.22631</div>
+              <div><strong>Uptime:</strong> 2d 20h</div>
+              <div><strong>Hostname:</strong> windows-pc.local</div>
+              <div><strong>Power:</strong> AC Power (Plugged in)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOWS UPDATES -->
+        <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">WINDOWS UPDATES</div>
+            <div style="font-size: 12px;">Not checked yet. This contacts Microsoft Update Service.</div>
+          </div>
+          <button class="btn-primary" onclick="alert('Checking Windows Update Service...')">Check Now</button>
+        </div>
+
+        <!-- ACCOUNTS CARD -->
+        <div style="background: rgba(15, 23, 42, 0.6); padding: 16px; border-radius: 12px; border: 1px solid var(--glass-border);">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px;">ACCOUNTS 1</div>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-weight: 700; font-size: 15px;">Kandi Koushik</span>
+                <span style="background: rgba(59,130,246,0.3); color: #60a5fa; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">YOU</span>
+                <span style="background: rgba(249,115,22,0.3); color: #fb923c; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">ADMIN</span>
+                <span style="background: rgba(34,197,94,0.3); color: #4ade80; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">SIGNED IN</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">@kandikoushik</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">HOME: %USERPROFILE% · SHELL: PowerShell · USER ID: 501 · On console since Aug 6 19:17</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   } else {
     title.innerText = currentTab.toUpperCase() + ' Inspector';
     content.innerHTML = `<div style="padding: 20px; color: var(--text-muted);">Scanning ${currentTab} data...</div>`;

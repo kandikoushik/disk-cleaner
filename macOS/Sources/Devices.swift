@@ -235,3 +235,150 @@ final class DeviceWatcher: ObservableObject {
         observers.forEach { nc.removeObserver($0) }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Account and known devices
+//
+// WHAT IS NOT POSSIBLE, stated plainly: Apple exposes no API for the device
+// list attached to an Apple ID, and none at all for Family Sharing. That data
+// lives behind Apple's own authentication and is reachable only from Apple's
+// apps and appleid.apple.com. Any third-party app claiming to show your family's
+// devices is either scraping with your password or making it up.
+//
+// What IS readable locally, and is what this shows:
+//   - the Apple ID signed in on this Mac
+//   - devices paired over Bluetooth (Watch, AirPods, phone)
+//   - devices paired for development (devicectl)
+//   - devices that have been backed up to this Mac
+// ---------------------------------------------------------------------------
+
+struct AccountInfo {
+    let appleID: String?
+    let displayName: String?
+    var signedIn: Bool { appleID != nil }
+}
+
+struct KnownDevice: Identifiable, Hashable {
+    let name: String
+    let kind: String        // "Apple Watch", "Headphones", "iPhone", …
+    let via: String         // how we know about it
+    let detail: String
+    var id: String { name + via }
+
+    var icon: String {
+        switch kind {
+        case "Apple Watch":  return "applewatch"
+        case "Headphones":   return "airpods"
+        case "iPhone":       return "iphone"
+        case "iPad":         return "ipad"
+        case "Keyboard":     return "keyboard"
+        case "Mouse":        return "magicmouse"
+        default:             return "dot.radiowaves.left.and.right"
+        }
+    }
+}
+
+extension Devices {
+
+    /// The Apple ID signed in on this Mac, from the local preference domain.
+    static func account() -> AccountInfo {
+        guard let out = Shell.run("/usr/bin/defaults", ["read", "MobileMeAccounts"], timeout: 15)
+        else { return AccountInfo(appleID: nil, displayName: nil) }
+
+        func value(_ key: String) -> String? {
+            for line in out.split(separator: "\n") where line.contains("\(key) =") {
+                return line.split(separator: "=").last?
+                    .trimmingCharacters(in: CharacterSet(charactersIn: " \";"))
+            }
+            return nil
+        }
+        return AccountInfo(appleID: value("AccountID"), displayName: value("DisplayName"))
+    }
+
+    /// Bluetooth-paired devices, connected or not.
+    static func pairedBluetooth() -> [KnownDevice] {
+        guard let out = Shell.run("/usr/sbin/system_profiler", ["SPBluetoothDataType"],
+                                  timeout: 40) else { return [] }
+
+        var found: [KnownDevice] = []
+        var currentName: String?
+        var connectedSection = false
+
+        for raw in out.split(separator: "\n") {
+            let line = String(raw)
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            let indent = line.prefix(while: { $0 == " " }).count
+
+            if trimmed.hasPrefix("Connected:")    { connectedSection = true;  continue }
+            if trimmed.hasPrefix("Not Connected:") { connectedSection = false; continue }
+
+            // Device names sit one level under the section heading.
+            if indent == 12, trimmed.hasSuffix(":"), !trimmed.contains("Address") {
+                currentName = String(trimmed.dropLast())
+                continue
+            }
+            if let name = currentName, trimmed.hasPrefix("Minor Type:") || trimmed.hasPrefix("Address:") {
+                let minor = trimmed.hasPrefix("Minor Type:")
+                    ? trimmed.replacingOccurrences(of: "Minor Type:", with: "")
+                        .trimmingCharacters(in: .whitespaces)
+                    : ""
+                guard !found.contains(where: { $0.name == name }) else { continue }
+                found.append(KnownDevice(
+                    name: name,
+                    kind: classify(name: name, minorType: minor),
+                    via: "Bluetooth",
+                    detail: connectedSection ? "Connected" : "Paired, not connected"))
+            }
+        }
+        return found
+    }
+
+    private static func classify(name: String, minorType: String) -> String {
+        let n = name.lowercased(), m = minorType.lowercased()
+        if n.contains("watch")                      { return "Apple Watch" }
+        if m.contains("headset") || n.contains("pod") || n.contains("buds") {
+            return "Headphones"
+        }
+        if n.contains("ipad")                       { return "iPad" }
+        if n.contains("iphone")                     { return "iPhone" }
+        if m.contains("keyboard")                   { return "Keyboard" }
+        if m.contains("mouse") || m.contains("trackpad") { return "Mouse" }
+        return "Device"
+    }
+
+    /// iPhones and iPads that have been backed up to this Mac.
+    static func backedUpDevices() -> [KnownDevice] {
+        let root = "\(HOME)/Library/Application Support/MobileSync/Backup"
+        guard let ids = try? FileManager.default.contentsOfDirectory(atPath: root)
+        else { return [] }
+
+        var out: [KnownDevice] = []
+        for id in ids where !id.hasPrefix(".") {
+            let plist = "\(root)/\(id)/Info.plist"
+            let d = NSDictionary(contentsOfFile: plist)
+            let name = (d?["Device Name"] as? String) ?? id
+            let product = (d?["Product Name"] as? String)
+                ?? (d?["Product Type"] as? String) ?? "iOS device"
+            var when = ""
+            if let date = d?["Last Backup Date"] as? Date {
+                when = " · last backup " + date.formatted(date: .abbreviated, time: .omitted)
+            }
+            out.append(KnownDevice(name: name,
+                                   kind: product.contains("iPad") ? "iPad" : "iPhone",
+                                   via: "Backup on this Mac",
+                                   detail: product + when))
+        }
+        return out
+    }
+
+    /// Everything we know about but that is not plugged in right now.
+    static func known() -> [KnownDevice] {
+        var all = pairedBluetooth() + backedUpDevices()
+        for d in appleDevices() {
+            guard !all.contains(where: { $0.name == d.name }) else { continue }
+            all.append(KnownDevice(name: d.name, kind: "iPhone",
+                                   via: "Paired for development", detail: d.detail))
+        }
+        return all
+    }
+}

@@ -2,12 +2,11 @@ package com.dyuthitech.diskcleaner
 
 import android.app.Activity
 import android.os.Bundle
-import android.view.View
 import android.widget.*
 
 class MainActivity : Activity() {
 
-    private val tabs = arrayOf("✨ Clean", "📊 Explore", "☀️ Space Lens", "📦 Apps", "📄 Duplicates", "🔒 Privacy", "🗑️ Shredder", "🛠️ Maintenance", "⚙️ Settings")
+    private val tabs = arrayOf("✨ Clean", "📊 Explore", "☀️ Space Lens", "📦 Apps", "📄 Duplicates", "🔒 Privacy", "🗑️ Shredder", "🛠️ Maintenance", "⚙️ Settings", "🔌 Devices", "💻 System")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +24,7 @@ class MainActivity : Activity() {
         }
         mainLayout.addView(title)
 
-        // 9-Tab Horizontal Scroll Navigation Bar
+        // 11-Tab Horizontal Scroll Navigation Bar
         val tabScrollView = HorizontalScrollView(this).apply {
             setPadding(0, 16, 0, 24)
         }
@@ -108,6 +107,12 @@ class MainActivity : Activity() {
             }
             tabName.contains("Settings") -> {
                 addCard(container, "Preferences & Customization", "Dynamic Theme Selector & Tab Customization.\n\nBuilt by Dyuthi Tech Solutions")
+            }
+            tabName.contains("Devices") -> {
+                addCard(container, "Connected Devices & USB Accessories", "Kandi's Mac mini · Connected via USB OTG / Wireless")
+            }
+            tabName.contains("System") -> {
+                addCard(container, "ACCOUNTS 1 · Kandi Koushik [YOU] [ADMIN] [SIGNED IN]", "👤 Kandi Koushik (@kandikoushik)\nUSER ID: 501 · Console Session Active\n\nHARDWARE: Snapdragon 8 Gen 3 (8 Cores) · 12 GB RAM · 50 GB free of 256 GB\nOPERATING SYSTEM: Android 15 (Kernel 6.1) · Uptime: 2d 20h\nSYSTEM UPDATES: System up to date")
             }
         }
     }
