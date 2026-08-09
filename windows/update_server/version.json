@@ -1,0 +1,7 @@
+{
+  "version": "2.1.0",
+  "minRequiredVersion": "2.0.0",
+  "downloadUrl": "https://github.com/dyuthitech/disk-cleaner-windows/releases/download/v2.1.0/DiskCleaner-Windows-Setup.exe",
+  "releaseDate": "2026-08-09",
+  "releaseNotes": "Version 2.1.0 includes automated background cleaning, new 2026 AI model cache targets (Ollama, HuggingFace, LM Studio), and faster multi-threaded directory sizing."
+}

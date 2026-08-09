@@ -3,7 +3,8 @@ import SwiftUI
 enum Page: String, CaseIterable, Identifiable {
     case clean = "Clean", explore = "Explore", spacelens = "Space Lens"
     case apps = "Apps", duplicates = "Duplicates", privacy = "Privacy"
-    case shredder = "Shredder", maintenance = "Maintenance", activity = "Activity", settings = "Settings"
+    case shredder = "Shredder", maintenance = "Maintenance", activity = "Activity"
+    case devices = "Devices", settings = "Settings"
     var id: String { rawValue }
     var icon: String {
         switch self {
@@ -16,6 +17,7 @@ enum Page: String, CaseIterable, Identifiable {
         case .shredder: return "xmark.bin"
         case .maintenance: return "wrench.and.screwdriver"
         case .activity: return "bolt.horizontal"
+        case .devices: return "cable.connector"
         case .settings: return "gearshape"
         }
     }
@@ -134,6 +136,10 @@ final class AppState: ObservableObject {
         pageOrderString = Page.allCases.map(\.rawValue).joined(separator: ",")
     }
 
+    // Connected devices — watched app-wide so plugging something in prompts
+    // wherever you happen to be.
+    let deviceWatcher = DeviceWatcher()
+
     // Feedback
     @Published var toast: String?
     private var toastTask: Task<Void, Never>?
@@ -186,6 +192,16 @@ final class AppState: ObservableObject {
     // ---- lifecycle ----------------------------------------------------------
 
     func start() {
+        deviceWatcher.start { [weak self] device in
+            guard let self else { return }
+            switch device.kind {
+            case .volume:
+                self.say("\(device.name) connected — open Devices to scan it")
+            case .iphone, .android:
+                self.say("\(device.name) connected — open Devices to copy from it")
+            }
+            self.page = .devices
+        }
         history = History.record()
         Task { await scan() }
         Task { await loadComposition() }

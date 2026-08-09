@@ -7,12 +7,19 @@ echo.
 
 if not exist out mkdir out
 
-echo ==> Compiling Windows CleanerEngine.cs
-csc /target:library /out:out\CleanerEngine.dll src\CleanerEngine.cs
+echo ==> Compiling Windows Standalone Executable (DiskCleaner.exe)
+csc /target:winexe /r:System.Windows.Forms.dll,System.Drawing.dll,System.Net.Http.dll /out:out\DiskCleaner.exe src\Program.cs src\CleanerEngine.cs
 
-echo ==> Bundling Native Windows Executable
-powershell -Command "Compress-Archive -Path src\* -DestinationPath out\DiskCleaner-Windows-v2.0.zip -Force"
+echo ==> Copying UI Assets to output directory
+copy src\App.html out\
+copy src\style.css out\
+copy src\app.js out\
+copy src\catalog.json out\
+
+echo ==> Bundling Native Windows Executable Package
+powershell -Command "Compress-Archive -Path out\* -DestinationPath out\DiskCleaner-Windows-v2.0.zip -Force"
 
 echo.
 echo Build Complete!
+echo Executable: out\DiskCleaner.exe
 echo Package: out\DiskCleaner-Windows-v2.0.zip

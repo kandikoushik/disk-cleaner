@@ -93,10 +93,10 @@ struct AttributionFooter: View {
             if Attribution.verified {
                 Image(systemName: "sparkle")
                     .font(.system(size: 8.5))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color.inkTertiary)
                 Text(Attribution.line)
                     .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(Color.inkTertiary)
                     .textSelection(.enabled)
             } else {
                 Image(systemName: "exclamationmark.triangle.fill")

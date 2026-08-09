@@ -113,4 +113,87 @@ namespace DiskCleanerNative.Windows
             }
         }
     }
+
+    public class UpdateCheckResult
+    {
+        public bool UpdateAvailable { get; set; }
+        public string LatestVersion { get; set; }
+        public string DownloadUrl { get; set; }
+        public string ReleaseNotes { get; set; }
+    }
+
+    public static class AutoUpdater
+    {
+        public const string CurrentVersion = "2.0.0";
+        public const string DefaultUpdateServerUrl = "https://raw.githubusercontent.com/dyuthitech/disk-cleaner-windows/main/version.json";
+
+        public static async Task<UpdateCheckResult> CheckForUpdatesAsync(string serverUrl = null)
+        {
+            string url = string.IsNullOrEmpty(serverUrl) ? DefaultUpdateServerUrl : serverUrl;
+            try
+            {
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromSeconds(8);
+                    string json = await client.GetStringAsync(url);
+                    // Simple parse version JSON
+                    if (json.Contains("\"version\""))
+                    {
+                        int vStart = json.IndexOf("\"version\"") + 10;
+                        int q1 = json.IndexOf('"', vStart);
+                        int q2 = json.IndexOf('"', q1 + 1);
+                        string latestVer = json.Substring(q1 + 1, q2 - q1 - 1);
+
+                        int uStart = json.IndexOf("\"downloadUrl\"");
+                        string dlUrl = "";
+                        if (uStart > 0)
+                        {
+                            int uq1 = json.IndexOf('"', uStart + 13);
+                            int uq2 = json.IndexOf('"', uq1 + 1);
+                            dlUrl = json.Substring(uq1 + 1, uq2 - uq1 - 1);
+                        }
+
+                        bool hasNewer = String.Compare(latestVer, CurrentVersion, StringComparison.OrdinalIgnoreCase) > 0;
+                        return new UpdateCheckResult
+                        {
+                            UpdateAvailable = hasNewer,
+                            LatestVersion = latestVer,
+                            DownloadUrl = dlUrl,
+                            ReleaseNotes = "New features, performance enhancements, and bug fixes."
+                        };
+                    }
+                }
+            }
+            catch { }
+            return new UpdateCheckResult { UpdateAvailable = false, LatestVersion = CurrentVersion };
+        }
+
+        public static async Task<bool> DownloadAndAutoReinstallAsync(string downloadUrl)
+        {
+            if (string.IsNullOrEmpty(downloadUrl)) return false;
+            try
+            {
+                string tempFile = Path.Combine(Path.GetTempPath(), "DiskCleanerSetup.exe");
+                using (var client = new System.Net.Http.HttpClient())
+                {
+                    byte[] data = await client.GetByteArrayAsync(downloadUrl);
+                    File.WriteAllBytes(tempFile, data);
+                }
+
+                // Launch silent background setup installer and auto-restart
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = tempFile,
+                    Arguments = "/SILENT /NORESTART",
+                    UseShellExecute = true
+                };
+                System.Diagnostics.Process.Start(psi);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
 }

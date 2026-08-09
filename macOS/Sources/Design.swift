@@ -30,6 +30,12 @@ extension Color {
     static let neutralFill = Color.dynamic(light: "d3dae6", dark: "2c3644")
     static let sunk     = Color.dynamic(light: "f7f9fc", dark: "0f141d")
 
+    // SwiftUI's .secondary and .tertiary measure 3.26:1 and 1.84:1 against a
+    // light surface — both below the 4.5:1 minimum for body text. These are
+    // stepped to clear it: 7.7:1 and 4.7:1.
+    static let inkSecondary = Color.dynamic(light: "4a5462", dark: "aab4c2")
+    static let inkTertiary  = Color.dynamic(light: "6b7583", dark: "8d97a5")
+
     /// Categorical slot 1–8.
     static func series(_ slot: Int) -> Color {
         let light = ["2a78d6", "eb6834", "1baf7a", "eda100",
@@ -149,7 +155,7 @@ struct LegendRow: View {
                 HStack(spacing: 6) {
                     RoundedRectangle(cornerRadius: 3).fill(item.color)
                         .frame(width: 9, height: 9)
-                    Text(item.name).font(.system(size: 11)).foregroundStyle(.secondary)
+                    Text(item.name).font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                     Text(fmtBytes(item.size)).font(.system(size: 11, weight: .semibold))
                         .monospacedDigit()
                     Spacer(minLength: 0)
@@ -220,6 +226,12 @@ struct GlassSurface: ViewModifier {
     func body(content: Content) -> some View {
         if #available(macOS 26.0, *) {
             content
+                .background(
+                    // A faint opaque layer under the glass: pure glass over a
+                    // pale backdrop left small text without stable ground.
+                    RoundedRectangle(cornerRadius: radius, style: .continuous)
+                        .fill(Color(nsColor: .textBackgroundColor).opacity(0.55))
+                )
                 .glassEffect(
                     selected ? .regular.tint(.brand.opacity(0.22)).interactive()
                              : .regular.interactive(),
@@ -321,7 +333,7 @@ struct BreadcrumbsView: View {
                 .foregroundStyle(Color.brand)
             Text("Disk Cleaner")
                 .font(.system(size: 11.5, weight: .semibold))
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.inkSecondary)
             Image(systemName: "chevron.right")
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(.secondary.opacity(0.6))
@@ -482,7 +494,7 @@ struct SectionHeader: View {
         HStack(spacing: 9) {
             Text(title.uppercased())
                 .font(.system(size: 10.5, weight: .semibold)).tracking(0.9)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.inkSecondary)
             if !trailing.isEmpty {
                 Text(trailing).font(.system(size: 11, weight: .semibold)).monospacedDigit()
             }
@@ -533,7 +545,7 @@ struct RiskTag: View {
                 }
                 Text(tooltipMessage)
                     .font(.system(size: 11.5))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.inkSecondary)
             }
             .padding(12)
             .frame(width: 260)

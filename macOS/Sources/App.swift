@@ -68,6 +68,7 @@ struct ContentView: View {
                         case .shredder:    ShredderView()
                         case .maintenance: MaintenanceView()
                         case .activity:    ActivityView()
+                    case .devices:     DevicesView()
                         case .settings:    SettingsView()
                         }
                     }

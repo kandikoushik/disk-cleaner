@@ -26,7 +26,7 @@ struct ExploreView: View {
                 Card {
                     VStack(alignment: .leading, spacing: 8) {
                         Text("\(app.history.count) samples")
-                            .font(.system(size: 11)).foregroundStyle(.secondary)
+                            .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                         Sparkline(samples: app.history)
                     }
                 }
@@ -90,7 +90,7 @@ struct ExploreView: View {
     }
 
     private func emptyNote(_ text: String) -> some View {
-        Text(text).font(.system(size: 12.5)).foregroundStyle(.secondary)
+        Text(text).font(.system(size: 12.5)).foregroundStyle(Color.inkSecondary)
             .frame(maxWidth: .infinity).padding(.vertical, 20)
     }
 }
@@ -110,7 +110,7 @@ struct EntryRow: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(name).font(.system(size: 13, weight: .medium))
                     .lineLimit(1).truncationMode(.middle)
-                Text(sub).font(.system(size: 11)).foregroundStyle(.secondary)
+                Text(sub).font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                     .lineLimit(1).truncationMode(.middle)
             }
             Spacer(minLength: 8)
@@ -150,7 +150,7 @@ struct ActivityView: View {
                 if app.activityLoading {
                     ProgressView().controlSize(.small)
                     Text("sampling energy…").font(.system(size: 11))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.inkSecondary)
                 }
                 Toggle("auto-refresh", isOn: Binding(
                     get: { app.autoRefresh },
@@ -158,13 +158,13 @@ struct ActivityView: View {
                 ))
                 .toggleStyle(.checkbox).font(.system(size: 12))
                 Spacer()
-                Text(app.activityStamp).font(.system(size: 11)).foregroundStyle(.secondary)
+                Text(app.activityStamp).font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
             }
 
             SectionHeader(title: "Listening ports", trailing: "\(app.ports.count) listening")
             if app.ports.isEmpty {
                 Text("Nothing is listening.").font(.system(size: 12.5))
-                    .foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(.vertical, 18)
+                    .foregroundStyle(Color.inkSecondary).frame(maxWidth: .infinity).padding(.vertical, 18)
             }
             ForEach(app.ports) { p in
                 HStack(spacing: 11) {
@@ -179,15 +179,15 @@ struct ActivityView: View {
                     VStack(alignment: .leading, spacing: 1) {
                         Text(p.name).font(.system(size: 13, weight: .medium))
                         Text("pid \(p.pid) · \(p.user) · \(p.addr)")
-                            .font(.system(size: 11)).foregroundStyle(.secondary)
+                            .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                     }
                     Spacer(minLength: 8)
                     Text(p.isLocal ? "local only" : "reachable")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.inkSecondary)
                     if p.protected {
                         Text("protected").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.inkSecondary)
                     } else {
                         Button("Quit") {
                             pendingQuit = ProcInfo(pid: p.pid, name: p.name, user: p.user,
@@ -209,20 +209,20 @@ struct ActivityView: View {
                         Text(p.name).font(.system(size: 13, weight: .medium))
                             .lineLimit(1).truncationMode(.middle)
                         Text("pid \(p.pid) · \(p.user)")
-                            .font(.system(size: 10.5)).foregroundStyle(.secondary)
+                            .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
                     }
                     Spacer(minLength: 8)
                     stat(fmtBytes(p.rss), "memory")
                     stat(String(format: "%.1f%%", p.cpu), "cpu")
                     if p.protected {
                         Text("protected").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.secondary).frame(width: 62)
+                            .foregroundStyle(Color.inkSecondary).frame(width: 62)
                     } else if p.mine {
                         Button("Quit") { pendingQuit = p }
                             .controlSize(.small).tint(.riskReview).frame(width: 62)
                     } else {
                         Text("other user").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(.secondary).frame(width: 62)
+                            .foregroundStyle(Color.inkSecondary).frame(width: 62)
                     }
                 }
                 .padding(.horizontal, 13).padding(.vertical, 9)
@@ -251,7 +251,7 @@ struct ActivityView: View {
         VStack(alignment: .trailing, spacing: 0) {
             Text(value).font(.system(size: 12.5, weight: .semibold)).monospacedDigit()
             Text(caption.uppercased()).font(.system(size: 8.5, weight: .medium))
-                .tracking(0.5).foregroundStyle(.secondary)
+                .tracking(0.5).foregroundStyle(Color.inkSecondary)
         }
         .frame(width: 66, alignment: .trailing)
     }
@@ -284,7 +284,7 @@ struct DuplicatesView: View {
             if app.duplicateGroups.isEmpty {
                 Text(app.duplicatesLoading ? "Scanning your Downloads, Documents, Desktop for duplicate files..." : "No duplicate files found.")
                     .font(.system(size: 12.5))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
             } else {
@@ -315,12 +315,12 @@ struct DuplicatesView: View {
                                             .font(.system(size: 12, weight: .medium))
                                         Text(file.location)
                                             .font(.system(size: 10.5))
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(Color.inkSecondary)
                                     }
                                     Spacer()
                                     Text(file.modified.formatted(date: .abbreviated, time: .shortened))
                                         .font(.system(size: 10.5))
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.inkSecondary)
 
                                     Button {
                                         Explore.reveal(file.path)
@@ -385,7 +385,7 @@ struct AppsView: View {
             } else if app.installedApps.isEmpty {
                 Text("No applications found.")
                     .font(.system(size: 12.5))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
             } else {
@@ -403,7 +403,7 @@ struct AppsView: View {
                                         .font(.system(size: 14, weight: .bold))
                                     Text(item.bundleID)
                                         .font(.system(size: 11))
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.inkSecondary)
                                 }
                                 Spacer()
                                 Text(fmtBytes(item.totalSize))
@@ -421,7 +421,7 @@ struct AppsView: View {
                                 Divider()
                                 Text("App Leftovers & Caches (\(item.residues.count) items):")
                                     .font(.system(size: 11, weight: .semibold))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.inkSecondary)
 
                                 ForEach(item.residues) { res in
                                     HStack {
@@ -431,7 +431,7 @@ struct AppsView: View {
                                         Text(fmtBytes(res.size))
                                             .font(.system(size: 11))
                                             .monospacedDigit()
-                                            .foregroundStyle(.secondary)
+                                            .foregroundStyle(Color.inkSecondary)
                                     }
                                 }
                             }
@@ -488,7 +488,7 @@ struct MaintenanceView: View {
                                 .font(.system(size: 14, weight: .semibold))
                             Text(task.note)
                                 .font(.system(size: 11.5))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.inkSecondary)
                         }
 
                         Spacer()
@@ -551,7 +551,7 @@ struct SpaceLensView: View {
             } else if app.spaceLensNodes.isEmpty {
                 Text("Tap Scan Space Lens to analyze disk folders.")
                     .font(.system(size: 12.5))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
             } else {
@@ -577,7 +577,7 @@ struct SpaceLensView: View {
                                         .font(.system(size: 13, weight: .medium))
                                     Text(tilde(node.path))
                                         .font(.system(size: 10.5))
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(Color.inkSecondary)
                                 }
 
                                 Spacer()
@@ -641,7 +641,7 @@ struct PrivacyView: View {
             } else if app.privacyItems.isEmpty {
                 Text("No browser privacy data found.")
                     .font(.system(size: 12.5))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 30)
             } else {
@@ -657,7 +657,7 @@ struct PrivacyView: View {
                                     .font(.system(size: 14, weight: .bold))
                                 Text("\(item.category) · \(tilde(item.path))")
                                     .font(.system(size: 11))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundStyle(Color.inkSecondary)
                             }
 
                             Spacer()
@@ -713,7 +713,7 @@ struct ShredderView: View {
                                 .font(.system(size: 14, weight: .bold))
                             Text("Overwrites target file bytes with dummy data before deletion. Irrecoverable.")
                                 .font(.system(size: 11.5))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.inkSecondary)
                         }
                     }
 
@@ -852,7 +852,7 @@ struct SettingsView: View {
                                 .font(.system(size: 14, weight: .bold))
                             Text("Customize tab order to suit your preference. Order auto-saves instantly.")
                                 .font(.system(size: 11.5))
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color.inkSecondary)
                         }
                         Spacer()
                         Button("Reset Default Order") {

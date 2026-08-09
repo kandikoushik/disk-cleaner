@@ -53,7 +53,7 @@ struct CleanView: View {
                     Text(app.byCategory.isEmpty
                          ? "Nothing reclaimable"
                          : "\(fmtBytes(app.reclaimable)) across \(app.byCategory.count) categories")
-                        .font(.system(size: 11)).foregroundStyle(.secondary)
+                        .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                     StackedBar(segments: app.byCategory
                         .sorted { $0.1 > $1.1 }
                         .map { StackSegment(id: $0.0.rawValue, size: $0.1,
@@ -73,7 +73,7 @@ struct CleanView: View {
                         Text(app.compositionReady
                              ? "\(fmtBytes(app.disk.used)) used of \(fmtBytes(app.disk.total))"
                              : "measuring your folders…")
-                            .font(.system(size: 11)).foregroundStyle(.secondary)
+                            .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
                     }
                     StackedBar(segments: compositionSegments)
                     LegendRow(items: app.composition.filter { $0.size > 0 }.map {
@@ -166,7 +166,7 @@ struct CleanView: View {
                             .buttonStyle(.plain)
                             .padding(.horizontal, 14).padding(.vertical, 6)
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color.inkSecondary)
                     }
                     .background(Color.sunk, in: Capsule())
                     .overlay(Capsule().strokeBorder(Color.hairline))
@@ -201,6 +201,9 @@ struct CleanView: View {
     }
 
     private var chips: some View {
+        // The row is wider than the window, so it must scroll. A right-edge
+        // fade signals there is more rather than letting a chip sit chopped in
+        // half at the boundary.
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 7) {
                 chip(label: "Everything",
@@ -220,6 +223,13 @@ struct CleanView: View {
             .padding(.vertical, 7)
             .padding(.horizontal, 2)
         }
+        .mask(
+            LinearGradient(stops: [
+                .init(color: .black, location: 0),
+                .init(color: .black, location: 0.94),
+                .init(color: .black.opacity(0), location: 1.0),
+            ], startPoint: .leading, endPoint: .trailing)
+        )
         .padding(.bottom, 6)
     }
 
@@ -243,7 +253,7 @@ struct CleanView: View {
                     Text(fmtBytes(amount))
                         .font(.system(size: 10.5, weight: .semibold))
                         .monospacedDigit()
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.inkSecondary)
                         .padding(.horizontal, 5).padding(.vertical, 1.5)
                         .background(Capsule().fill(Color.primary.opacity(0.07)))
                 }
@@ -292,7 +302,7 @@ struct CleanView: View {
                 && app.rows(for: .review).isEmpty && !app.scanning {
                 Text(app.search.isEmpty ? "✨ Nothing to clean — all clear."
                                         : "No target matches that search.")
-                    .font(.system(size: 12.5)).foregroundStyle(.secondary)
+                    .font(.system(size: 12.5)).foregroundStyle(Color.inkSecondary)
                     .frame(maxWidth: .infinity).padding(.vertical, 30)
             }
         }
@@ -377,7 +387,7 @@ struct TargetRow: View {
                         Text(fmtBytes(s)).font(.system(size: 14.5, weight: .semibold))
                             .monospacedDigit()
                     } else {
-                        Text("measuring…").font(.system(size: 11.5)).foregroundStyle(.secondary)
+                        Text("measuring…").font(.system(size: 11.5)).foregroundStyle(Color.inkSecondary)
                     }
                 }
 
@@ -386,7 +396,7 @@ struct TargetRow: View {
                 }
 
                 Text(state.target.note + (state.count > 0 ? " · \(state.count) items" : ""))
-                    .font(.system(size: 12)).foregroundStyle(.secondary)
+                    .font(.system(size: 12)).foregroundStyle(Color.inkSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 10) {
@@ -423,7 +433,7 @@ struct TargetRow: View {
                 if entries.isEmpty {
                     Text("Runs a command — there is no direct file list to show.")
                         .font(.system(size: 11.5))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.inkSecondary)
                         .padding(.vertical, 6)
                 } else {
                     pathHeader(entries)
@@ -441,7 +451,7 @@ struct TargetRow: View {
                 HStack(spacing: 7) {
                     ProgressView().controlSize(.small)
                     Text("Reading contents…").font(.system(size: 11.5))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(Color.inkSecondary)
                 }
                 .padding(.vertical, 8)
             }
@@ -460,13 +470,13 @@ struct TargetRow: View {
                 .font(.system(size: 11, weight: .semibold))
             Text(fmtBytes(entries.reduce(0) { $0 + $1.size }))
                 .font(.system(size: 11, weight: .semibold)).monospacedDigit()
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.inkSecondary)
 
             Spacer()
 
             if !picked.isEmpty {
                 Text("\(picked.count) selected")
-                    .font(.system(size: 10.5)).foregroundStyle(.secondary)
+                    .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
                 Button {
                     let doomed = entries.filter { picked.contains($0.path) }
                     picked.removeAll()
@@ -511,7 +521,7 @@ struct TargetRow: View {
                     .font(.system(size: 11.5, weight: .medium))
                     .lineLimit(1).truncationMode(.middle)
                 Text(folder)
-                    .font(.system(size: 10)).foregroundStyle(.tertiary)
+                    .font(.system(size: 10)).foregroundStyle(Color.inkTertiary)
                     .lineLimit(1).truncationMode(.head)
             }
 
@@ -519,7 +529,7 @@ struct TargetRow: View {
 
             Text(fmtBytes(e.size))
                 .font(.system(size: 11, weight: .semibold)).monospacedDigit()
-                .foregroundStyle(.secondary)
+                .foregroundStyle(Color.inkSecondary)
 
             Button { Explore.reveal(e.path) } label: {
                 Image(systemName: "magnifyingglass").font(.system(size: 10.5))
