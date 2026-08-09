@@ -1,0 +1,9 @@
+# Build output
+out/
+*.dmg
+*.o
+*.swiftmodule
+.DS_Store
+
+# Screenshots / scratch
+*.png
