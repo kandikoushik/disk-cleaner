@@ -82,10 +82,18 @@ function renderView() {
       </div>
     `;
   } else if (currentTab === 'settings') {
-    title.innerText = 'Preferences & Tab Layout Customization';
+    title.innerText = 'Preferences & Dynamic 3D Themes';
     content.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="font-weight: 600; font-size: 14px;">General Preferences</div>
+        <div style="font-weight: 600; font-size: 14px;">Dynamic Background Theme & 3D Lighting</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn-primary" style="font-size: 12px;" onclick="applyWinTheme('aurora')">🌌 Aurora Glass</button>
+          <button class="btn-primary" style="font-size: 12px;" onclick="applyWinTheme('midnight')">🌙 Midnight Neon</button>
+          <button class="btn-primary" style="font-size: 12px;" onclick="applyWinTheme('cyberpunk')">🔥 Cyberpunk Amber</button>
+          <button class="btn-primary" style="font-size: 12px;" onclick="applyWinTheme('emerald')">🌲 Emerald Deep</button>
+          <button class="btn-primary" style="font-size: 12px;" onclick="applyWinTheme('obsidian')">🖤 Pure Obsidian</button>
+        </div>
+        <hr style="border: 0; border-top: 1px solid var(--glass-border);">
         <label style="font-size: 13px; display: flex; align-items: center; gap: 8px;">
           <input type="checkbox" checked> Move deleted items to Recycle Bin (recoverable delete)
         </label>
@@ -93,7 +101,7 @@ function renderView() {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             <div style="font-weight: 600; font-size: 14px;">Rearrange Tab & Tile Order</div>
-            <div style="font-size: 12px; color: var(--text-muted);">Re-order tabs to match your workflow. Saved automatically to your system preferences.</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Re-order tabs to match your workflow. Saved automatically.</div>
           </div>
           <button class="btn-primary" style="font-size: 12px;" onclick="resetWinTabs()">Reset Default Order</button>
         </div>
@@ -147,4 +155,17 @@ function scanTargets() {
   alert('Scanning Windows targets...');
 }
 
-document.addEventListener('DOMContentLoaded', loadCatalog);
+function applyWinTheme(themeName) {
+  document.body.className = themeName === 'aurora' ? '' : 'theme-' + themeName;
+  localStorage.setItem('winTheme', themeName);
+}
+
+function initWinTheme() {
+  const saved = localStorage.getItem('winTheme') || 'aurora';
+  applyWinTheme(saved);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initWinTheme();
+  loadCatalog();
+});

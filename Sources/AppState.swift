@@ -26,6 +26,26 @@ enum SortMode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
+enum Theme: String, CaseIterable, Identifiable {
+    case aurora = "Aurora Glass"
+    case midnight = "Midnight Neon"
+    case cyberpunk = "Cyberpunk Amber"
+    case emerald = "Emerald Deep"
+    case obsidian = "Pure Obsidian"
+    
+    var id: String { rawValue }
+    
+    var colors: (Color, Color, Color) {
+        switch self {
+        case .aurora: return (Color.dynamic(light: "3b6cf6", dark: "5d8bff"), Color.dynamic(light: "7a5cf0", dark: "9b7bff"), Color.dynamic(light: "1baf7a", dark: "3ddc97"))
+        case .midnight: return (Color.dynamic(light: "4f46e5", dark: "6366f1"), Color.dynamic(light: "9333ea", dark: "a855f7"), Color.dynamic(light: "ec4899", dark: "f472b6"))
+        case .cyberpunk: return (Color.dynamic(light: "f59e0b", dark: "fbbf24"), Color.dynamic(light: "ef4444", dark: "f87171"), Color.dynamic(light: "8b5cf6", dark: "a78bfa"))
+        case .emerald: return (Color.dynamic(light: "10b981", dark: "34d399"), Color.dynamic(light: "06b6d4", dark: "22d3ee"), Color.dynamic(light: "3b82f6", dark: "60a5fa"))
+        case .obsidian: return (Color.dynamic(light: "475569", dark: "64748b"), Color.dynamic(light: "334155", dark: "475569"), Color.dynamic(light: "1e293b", dark: "334155"))
+        }
+    }
+}
+
 @MainActor
 final class AppState: ObservableObject {
 
@@ -82,26 +102,6 @@ final class AppState: ObservableObject {
 
     /// Recoverable deletes are the default — every mainstream cleaner does this,
     /// and it turns a mistake into a Finder drag rather than a data loss.
-enum Theme: String, CaseIterable, Identifiable {
-    case aurora = "Aurora Glass"
-    case midnight = "Midnight Neon"
-    case cyberpunk = "Cyberpunk Amber"
-    case emerald = "Emerald Deep"
-    case obsidian = "Pure Obsidian"
-    
-    var id: String { rawValue }
-    
-    var colors: (Color, Color, Color) {
-        switch self {
-        case .aurora: return (Color.dynamic(light: "3b6cf6", dark: "5d8bff"), Color.dynamic(light: "7a5cf0", dark: "9b7bff"), Color.dynamic(light: "1baf7a", dark: "3ddc97"))
-        case .midnight: return (Color.dynamic(light: "4f46e5", dark: "6366f1"), Color.dynamic(light: "9333ea", dark: "a855f7"), Color.dynamic(light: "ec4899", dark: "f472b6"))
-        case .cyberpunk: return (Color.dynamic(light: "f59e0b", dark: "fbbf24"), Color.dynamic(light: "ef4444", dark: "f87171"), Color.dynamic(light: "8b5cf6", dark: "a78bfa"))
-        case .emerald: return (Color.dynamic(light: "10b981", dark: "34d399"), Color.dynamic(light: "06b6d4", dark: "22d3ee"), Color.dynamic(light: "3b82f6", dark: "60a5fa"))
-        case .obsidian: return (Color.dynamic(light: "475569", dark: "64748b"), Color.dynamic(light: "334155", dark: "475569"), Color.dynamic(light: "1e293b", dark: "334155"))
-        }
-    }
-}
-
     @AppStorage("useTrash") var useTrash = true
     @AppStorage("selectedTheme") var selectedThemeRaw: String = Theme.aurora.rawValue
     @AppStorage("pageOrder") var pageOrderString: String = "Clean,Explore,Space Lens,Apps,Duplicates,Privacy,Shredder,Maintenance,Activity,Settings"

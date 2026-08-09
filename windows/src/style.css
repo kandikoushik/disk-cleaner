@@ -14,6 +14,30 @@
   --risk-review: #ef4444;
 }
 
+body.theme-midnight {
+  --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #0f172a 100%);
+  --brand: #6366f1;
+  --brand-secondary: #a855f7;
+}
+
+body.theme-cyberpunk {
+  --bg-gradient: linear-gradient(135deg, #2a0808 0%, #451a03 50%, #1e1b4b 100%);
+  --brand: #f59e0b;
+  --brand-secondary: #ef4444;
+}
+
+body.theme-emerald {
+  --bg-gradient: linear-gradient(135deg, #064e3b 0%, #083344 50%, #0f172a 100%);
+  --brand: #10b981;
+  --brand-secondary: #06b6d4;
+}
+
+body.theme-obsidian {
+  --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  --brand: #64748b;
+  --brand-secondary: #475569;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -29,9 +53,52 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* 3D Floating Mesh Orbs Background */
+.backdrop-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+  animation: float3D 14s ease-in-out infinite alternate;
+}
+
+.orb-1 {
+  width: 500px;
+  height: 500px;
+  background: var(--brand);
+  top: -100px;
+  left: -100px;
+}
+
+.orb-2 {
+  width: 450px;
+  height: 450px;
+  background: var(--brand-secondary);
+  top: 40%;
+  right: -100px;
+  animation-delay: -5s;
+}
+
+@keyframes float3D {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(40px, -30px, 50px) scale(1.1) rotate(120deg);
+  }
+  100% {
+    transform: translate3d(-30px, 40px, -20px) scale(0.95) rotate(240deg);
+  }
 }
 
 .window-container {
+  position: relative;
+  z-index: 1;
   max-width: 1080px;
   width: 100%;
   margin: 0 auto;
