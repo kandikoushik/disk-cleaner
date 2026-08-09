@@ -189,5 +189,46 @@ enum Catalog {
                risk: .review, category: .personal,
                source: .paths(["\(HOME)/Desktop/Screenshot*.png",
                                "\(HOME)/Desktop/Screen Shot*.png"])),
+
+        // ---- Developer & AI Caches ----
+        Target(id: "xcode_previews", label: "Xcode SwiftUI Previews",
+               note: "Canvas render caches. Xcode regenerates them on preview.",
+               risk: .safe, category: .xcode,
+               source: .paths(["\(HOME)/Library/Developer/Xcode/UserData/Previews/*"])),
+
+        Target(id: "xcode_indexing", label: "Xcode Indexing Cache",
+               note: "Symbol and search indexes. Xcode rebuilds automatically.",
+               risk: .safe, category: .xcode,
+               source: .paths(["\(HOME)/Library/Caches/com.apple.dt.Xcode/*"])),
+
+        Target(id: "ai_ollama", label: "Ollama LLM Models",
+               note: "Local GGUF models. Re-downloadable via `ollama run`.",
+               risk: .review, category: .apps,
+               source: .paths(["\(HOME)/.ollama/models/*"])),
+
+        Target(id: "ai_huggingface", label: "HuggingFace & PyTorch Cache",
+               note: "Downloaded model weights, datasets, and tokenizers.",
+               risk: .safe, category: .apps,
+               source: .paths(["\(HOME)/.cache/huggingface/*"])),
+
+        Target(id: "cargo_cache", label: "Cargo (Rust) package cache",
+               note: "Crates.io registry and git clones. Re-fetched on build.",
+               risk: .safe, category: .packages,
+               source: .paths(["\(HOME)/.cargo/registry/*", "\(HOME)/.cargo/git/*"])),
+
+        Target(id: "go_cache", label: "Go build & module cache",
+               note: "Compiled packages and downloaded modules.",
+               risk: .safe, category: .packages,
+               source: .paths(["\(HOME)/Library/Caches/go-build/*"])),
+
+        Target(id: "bun_cache", label: "Bun package store",
+               note: "Bun tarball and install cache.",
+               risk: .safe, category: .packages,
+               source: .paths(["\(HOME)/.bun/install/cache/*"])),
+
+        Target(id: "jetbrains_cache", label: "JetBrains IDE caches",
+               note: "IntelliJ, PyCharm, WebStorm compile and index caches.",
+               risk: .safe, category: .apps,
+               source: .paths(["\(HOME)/Library/Caches/JetBrains/*"])),
     ]
 }

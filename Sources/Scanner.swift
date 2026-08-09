@@ -31,12 +31,41 @@ enum Sizer {
     static let cache = SizeCache()
 
     private static let keys: Set<URLResourceKey> = [
-        .isDirectoryKey, .isSymbolicLinkKey, .totalFileAllocatedSizeKey, .fileAllocatedSizeKey,
+        .isDirectoryKey, .isSymbolicLinkKey, .totalFileAllocatedSizeKey,
+        .fileAllocatedSizeKey, .fileResourceIdentifierKey, .linkCountKey,
     ]
 
+    /// Tracks inodes already counted in one scan.
+    ///
+    /// Hard-linked files (pnpm and npm link package contents aggressively, and
+    /// Time Machine uses them everywhere) appear once per link on disk but
+    /// occupy one set of blocks. Counting each link at full size inflates a
+    /// folder's reported size — sometimes by a lot.
+    final class SeenSet: @unchecked Sendable {
+        private var seen = Set<Int>()
+        private let lock = NSLock()
+
+        /// True the first time an inode is offered, false for every repeat.
+        func firstSight(_ id: Int) -> Bool {
+            lock.lock(); defer { lock.unlock() }
+            return seen.insert(id).inserted
+        }
+    }
+
     /// Bytes actually occupied on disk by a single file.
-    private static func allocated(_ url: URL) -> Int64 {
+    ///
+    /// When `seen` is supplied, a file with multiple hard links is counted only
+    /// the first time it is encountered in that scan.
+    private static func allocated(_ url: URL, seen: SeenSet? = nil) -> Int64 {
         guard let v = try? url.resourceValues(forKeys: keys) else { return 0 }
+        if let seen, let links = v.linkCount, links > 1 {
+            var inode = 0
+            if let idAny = v.fileResourceIdentifier {
+                // fileResourceIdentifier is opaque but stable and hashable per file.
+                inode = (idAny as AnyObject).hash
+            }
+            if inode != 0, !seen.firstSight(inode) { return 0 }
+        }
         if let a = v.totalFileAllocatedSize { return Int64(a) }
         if let a = v.fileAllocatedSize { return Int64(a) }
         return 0
@@ -44,13 +73,13 @@ enum Sizer {
 
     /// Walk one subtree on the current thread. Symlinks are counted as entries,
     /// never followed — otherwise a loop would hang the scan.
-    static func walk(_ path: String) -> Int64 {
+    static func walk(_ path: String, seen: SeenSet? = nil) -> Int64 {
         let fm = FileManager.default
         var isDir: ObjCBool = false
         guard fm.fileExists(atPath: path, isDirectory: &isDir) else { return 0 }
         let url = URL(fileURLWithPath: path)
 
-        if !isDir.boolValue { return allocated(url) }
+        if !isDir.boolValue { return allocated(url, seen: seen) }
         if (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == true {
             return 0
         }
@@ -64,7 +93,7 @@ enum Sizer {
             let v = try? child.resourceValues(forKeys: keys)
             if v?.isSymbolicLink == true { e.skipDescendants(); continue }
             if v?.isDirectory == true { continue }
-            total += allocated(child)
+            total += allocated(child, seen: seen)
         }
         return total
     }
@@ -79,6 +108,9 @@ enum Sizer {
             return 0
         }
 
+        // One shared inode set per top-level measurement, so hard links are
+        // counted once even when the walk is split across cores.
+        let seen = SeenSet()
         var total: Int64 = 0
         if isDir.boolValue,
            let children = try? fm.contentsOfDirectory(atPath: path), children.count > 1 {
@@ -86,14 +118,14 @@ enum Sizer {
             total = await withTaskGroup(of: Int64.self) { group in
                 for c in children {
                     let sub = (path as NSString).appendingPathComponent(c)
-                    group.addTask { walk(sub) }
+                    group.addTask { walk(sub, seen: seen) }
                 }
                 var sum: Int64 = 0
                 for await v in group { sum += v }
                 return sum
             }
         } else {
-            total = walk(path)
+            total = walk(path, seen: seen)
         }
 
         await cache.set(path, total)

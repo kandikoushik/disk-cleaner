@@ -206,9 +206,34 @@ enum Activity {
         "Disk Cleaner", "DiskCleaner",
     ]
 
-    static func processes(limit: Int = 30) -> [ProcInfo] {
+    /// Energy Impact per pid, read from `top`.
+    ///
+    /// `ps` has no energy field at all. Activity Monitor's number comes from
+    /// `top -stats power`, which needs two samples: the first is cumulative
+    /// since boot, only the second reflects the current moment. No root needed.
+    static func energyByPID() -> [Int32: Double] {
+        guard let out = Shell.run("/usr/bin/top",
+                                  ["-l", "2", "-n", "60", "-o", "power",
+                                   "-stats", "pid,power"], timeout: 30)
+        else { return [:] }
+
+        // Keep only the final sample; earlier blocks are the boot-cumulative one.
+        let blocks = out.components(separatedBy: "PID")
+        guard let last = blocks.last else { return [:] }
+
+        var map: [Int32: Double] = [:]
+        for line in last.split(separator: "\n") {
+            let f = line.split(separator: " ", omittingEmptySubsequences: true)
+            guard f.count >= 2, let pid = Int32(f[0]), let p = Double(f[1]) else { continue }
+            map[pid] = p
+        }
+        return map
+    }
+
+    static func processes(limit: Int = 30, withEnergy: Bool = true) -> [ProcInfo] {
         guard let out = Shell.run("/bin/ps", ["-axo", "pid=,user=,pcpu=,rss=,comm="])
         else { return [] }
+        let energy = withEnergy ? energyByPID() : [:]
         let me = NSUserName()
         var list: [ProcInfo] = []
         for line in out.split(separator: "\n") {
@@ -220,9 +245,16 @@ enum Activity {
             let user = String(f[1])
             list.append(ProcInfo(pid: pid, name: name, user: user, cpu: cpu,
                                  rss: rssKB * 1024, mine: user == me,
-                                 protected: protectedNames.contains(name)))
+                                 protected: protectedNames.contains(name),
+                                 power: energy[pid] ?? 0))
         }
         return Array(list.sorted { $0.rss > $1.rss }.prefix(limit))
+    }
+
+    /// Same processes, ranked by what is actually draining the battery.
+    static func byEnergy(limit: Int = 15) -> [ProcInfo] {
+        Array(processes(limit: 500).sorted { $0.power > $1.power }
+            .filter { $0.power > 0 }.prefix(limit))
     }
 
     static func ports() -> [PortInfo] {

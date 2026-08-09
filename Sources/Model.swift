@@ -111,7 +111,19 @@ struct ProcInfo: Identifiable, Hashable {
     let rss: Int64
     let mine: Bool
     let protected: Bool
+    /// Energy Impact, the same composite figure Activity Monitor shows.
+    var power: Double = 0
     var id: Int32 { pid }
+
+    /// Buckets matching how Activity Monitor talks about energy use.
+    var powerLabel: String {
+        switch power {
+        case ..<1:   return "idle"
+        case ..<10:  return "low"
+        case ..<30:  return "moderate"
+        default:     return "high"
+        }
+    }
 }
 
 struct PortInfo: Identifiable, Hashable {
