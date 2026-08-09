@@ -135,9 +135,8 @@ struct CleanView: View {
                     .textFieldStyle(.plain)
                     .font(.system(size: 12.5))
             }
-            .padding(.horizontal, 10).padding(.vertical, 6)
-            .background(RoundedRectangle(cornerRadius: 8).fill(Color.sunk))
-            .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Color.hairline))
+            .padding(.horizontal, 11).padding(.vertical, 7)
+            .glassSurface(radius: 9)
             .frame(width: 220)
 
             Picker("", selection: $app.sort) {
@@ -170,9 +169,8 @@ struct CleanView: View {
                 .padding(.horizontal, 11).padding(.vertical, 5)
         }
         .buttonStyle(.plain)
-        .background(active ? Color.primary : Color.clear, in: Capsule())
-        .overlay(Capsule().strokeBorder(active ? Color.clear : Color.hairline))
-        .foregroundStyle(active ? Color(nsColor: .windowBackgroundColor) : .secondary)
+        .glassChip(active: active)
+        .foregroundStyle(active ? Color.primary : .secondary)
     }
 
     // ---- list ---------------------------------------------------------------

@@ -41,14 +41,8 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     hero
-                    Picker("", selection: $app.page) {
-                        ForEach(Page.allCases) { p in
-                            Label(p.rawValue, systemImage: p.icon).tag(p)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .padding(.vertical, 12)
+                    GlassTabBar(selection: $app.page)
+                        .padding(.vertical, 12)
 
                     switch app.page {
                     case .clean:       CleanView()

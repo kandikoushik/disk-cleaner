@@ -296,6 +296,84 @@ struct Card<Content: View>: View {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Glass tab bar
+//
+// A stock `.pickerStyle(.segmented)` keeps AppKit's own segmented control and
+// never becomes glass. This is the hand-built equivalent: one glass container,
+// with the selected pill carrying a `glassEffectID` so the highlight *morphs*
+// between tabs — the signature Liquid Glass motion — instead of cross-fading.
+// ---------------------------------------------------------------------------
+
+struct GlassTabBar: View {
+    @Binding var selection: Page
+    @Namespace private var pillSpace
+
+    var body: some View {
+        if #available(macOS 26.0, *) {
+            GlassEffectContainer(spacing: 6) {
+                HStack(spacing: 4) {
+                    ForEach(Page.allCases) { page in
+                        tab(page)
+                            .background {
+                                if selection == page {
+                                    Capsule()
+                                        .fill(Color.brand.opacity(0.001))
+                                        .glassEffect(.regular.tint(.brand.opacity(0.35))
+                                            .interactive(), in: Capsule())
+                                        .glassEffectID(page.id, in: pillSpace)
+                                }
+                            }
+                    }
+                }
+                .padding(5)
+                .glassEffect(.regular, in: Capsule())
+            }
+            .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
+        } else {
+            HStack(spacing: 4) {
+                ForEach(Page.allCases) { page in
+                    tab(page)
+                        .background {
+                            if selection == page {
+                                Capsule().fill(Color.brand.opacity(0.18))
+                            }
+                        }
+                }
+            }
+            .padding(5)
+            .background(Capsule().fill(Color.sunk))
+            .overlay(Capsule().strokeBorder(Color.hairline))
+            .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
+        }
+    }
+
+    private func tab(_ page: Page) -> some View {
+        Button {
+            selection = page
+        } label: {
+            HStack(spacing: 5) {
+                Image(systemName: page.icon).font(.system(size: 11, weight: .semibold))
+                Text(page.rawValue).font(.system(size: 12.5, weight: .medium))
+            }
+            .padding(.horizontal, 13).padding(.vertical, 7)
+            .foregroundStyle(selection == page ? Color.primary : Color.secondary)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// Glass field for search and other inline inputs.
+struct GlassField<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View {
+        content
+            .padding(.horizontal, 11).padding(.vertical, 7)
+            .glassSurface(radius: 9)
+    }
+}
+
 struct SectionHeader: View {
     let title: String
     var trailing: String = ""
@@ -346,9 +424,34 @@ struct Toast: View {
         Text(text)
             .font(.system(size: 12.5, weight: .medium))
             .padding(.horizontal, 18).padding(.vertical, 10)
-            .background(.regularMaterial, in: Capsule())
-            .overlay(Capsule().strokeBorder(Color.hairline))
+            .glassCapsule()
             .shadow(color: .black.opacity(0.18), radius: 14, y: 6)
             .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Small glass helpers
+// ---------------------------------------------------------------------------
+
+extension View {
+    /// Pill used for the category filters.
+    @ViewBuilder func glassChip(active: Bool) -> some View {
+        if #available(macOS 26.0, *) {
+            self.glassEffect(active ? .regular.tint(.brand.opacity(0.4)).interactive()
+                                    : .regular.interactive(), in: Capsule())
+        } else {
+            self.background(active ? Color.brand.opacity(0.18) : Color.clear, in: Capsule())
+                .overlay(Capsule().strokeBorder(active ? Color.clear : Color.hairline))
+        }
+    }
+
+    @ViewBuilder func glassCapsule() -> some View {
+        if #available(macOS 26.0, *) {
+            self.glassEffect(.regular, in: Capsule())
+        } else {
+            self.background(.regularMaterial, in: Capsule())
+                .overlay(Capsule().strokeBorder(Color.hairline))
+        }
     }
 }
