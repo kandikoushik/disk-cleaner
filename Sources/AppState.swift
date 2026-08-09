@@ -54,6 +54,7 @@ final class AppState: ObservableObject {
     @Published var ports: [PortInfo] = []
     @Published var activityStamp = ""
     @Published var autoRefresh = false
+    @Published var activityLoading = false
 
     // Apps / uninstaller
     @Published var installedApps: [AppEntry] = []
@@ -282,10 +283,21 @@ final class AppState: ObservableObject {
 
     // ---- activity -----------------------------------------------------------
 
+    /// Reading processes and ports shells out to `top` and `lsof`. `top` needs
+    /// two samples to report energy, which costs a couple of seconds — so this
+    /// has to stay off the main actor or the whole window freezes while it runs.
     func loadActivity() {
-        procs = Activity.processes()
-        ports = Activity.ports()
-        activityStamp = "updated " + Date().formatted(date: .omitted, time: .standard)
+        guard !activityLoading else { return }
+        activityLoading = true
+        Task {
+            let result = await Task.detached(priority: .userInitiated) {
+                (procs: Activity.processes(), ports: Activity.ports())
+            }.value
+            procs = result.procs
+            ports = result.ports
+            activityStamp = "updated " + Date().formatted(date: .omitted, time: .standard)
+            activityLoading = false
+        }
     }
 
     func setAutoRefresh(_ on: Bool) {

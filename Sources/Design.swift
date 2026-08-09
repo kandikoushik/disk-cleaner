@@ -108,19 +108,27 @@ struct StackedBar: View {
 
     var body: some View {
         GeometryReader { geo in
+            // The 2px gaps are real width. Budgeting only for the segments and
+            // then adding gaps on top overflows the card — subtract the gaps and
+            // the per-segment minimum from the width being divided up.
+            let gaps = CGFloat(max(0, segments.count - 1)) * 2
+            let minima = CGFloat(segments.count) * 2
+            let usable = max(0, geo.size.width - gaps - minima)
+
             HStack(spacing: 2) {
                 ForEach(segments) { s in
                     RoundedRectangle(cornerRadius: 2, style: .continuous)
                         .fill(s.color)
-                        .frame(width: max(2, geo.size.width * CGFloat(s.size) / CGFloat(total)))
+                        .frame(width: 2 + usable * CGFloat(s.size) / CGFloat(total))
                         .help("\(s.id) — \(fmtBytes(s.size))")
                 }
             }
-            .frame(height: height)
+            .frame(width: geo.size.width, height: height, alignment: .leading)
             .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         }
         .frame(height: height)
         .background(RoundedRectangle(cornerRadius: 7, style: .continuous).fill(Color.track))
+        .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
         .animation(.easeInOut(duration: 0.6), value: total)
     }
 }
@@ -312,7 +320,7 @@ struct GlassTabBar: View {
     var body: some View {
         if #available(macOS 26.0, *) {
             GlassEffectContainer(spacing: 6) {
-                HStack(spacing: 4) {
+                HStack(spacing: 2) {
                     ForEach(Page.allCases) { page in
                         tab(page)
                             .background {
@@ -326,12 +334,13 @@ struct GlassTabBar: View {
                             }
                     }
                 }
-                .padding(5)
+                .padding(4)
                 .glassEffect(.regular, in: Capsule())
             }
+            .fixedSize()
             .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
         } else {
-            HStack(spacing: 4) {
+            HStack(spacing: 2) {
                 ForEach(Page.allCases) { page in
                     tab(page)
                         .background {
@@ -341,7 +350,7 @@ struct GlassTabBar: View {
                         }
                 }
             }
-            .padding(5)
+            .padding(4)
             .background(Capsule().fill(Color.sunk))
             .overlay(Capsule().strokeBorder(Color.hairline))
             .animation(.spring(response: 0.34, dampingFraction: 0.76), value: selection)
@@ -355,8 +364,10 @@ struct GlassTabBar: View {
             HStack(spacing: 5) {
                 Image(systemName: page.icon).font(.system(size: 11, weight: .semibold))
                 Text(page.rawValue).font(.system(size: 12.5, weight: .medium))
+                    .fixedSize()
             }
-            .padding(.horizontal, 13).padding(.vertical, 7)
+            .frame(minWidth: 96)
+            .padding(.horizontal, 10).padding(.vertical, 7)
             .foregroundStyle(selection == page ? Color.primary : Color.secondary)
             .contentShape(Capsule())
         }

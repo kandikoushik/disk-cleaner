@@ -41,8 +41,12 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     hero
-                    GlassTabBar(selection: $app.page)
-                        .padding(.vertical, 12)
+                    HStack {
+                        Spacer(minLength: 0)
+                        GlassTabBar(selection: $app.page)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 12)
 
                     switch app.page {
                     case .clean:       CleanView()

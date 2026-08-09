@@ -146,6 +146,12 @@ struct ActivityView: View {
                 Button { app.loadActivity() } label: {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
+                .disabled(app.activityLoading)
+                if app.activityLoading {
+                    ProgressView().controlSize(.small)
+                    Text("sampling energy…").font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
                 Toggle("auto-refresh", isOn: Binding(
                     get: { app.autoRefresh },
                     set: { app.setAutoRefresh($0) }
@@ -353,6 +359,7 @@ struct DuplicatesView: View {
 
 struct AppsView: View {
     @EnvironmentObject var app: AppState
+    @State private var pendingUninstall: AppEntry?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -386,10 +393,10 @@ struct AppsView: View {
 
                 ForEach(app.installedApps) { item in
                     Card {
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: 10) {
                             HStack(spacing: 12) {
                                 Image(systemName: "shippingbox.fill")
-                                    .font(.system(size: 20))
+                                    .font(.system(size: 22))
                                     .foregroundStyle(Color.brand)
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.name)
@@ -402,6 +409,12 @@ struct AppsView: View {
                                 Text(fmtBytes(item.totalSize))
                                     .font(.system(size: 14, weight: .bold))
                                     .monospacedDigit()
+                                
+                                Button("Uninstall") {
+                                    pendingUninstall = item
+                                }
+                                .glassButton()
+                                .tint(.riskReview)
                             }
 
                             if !item.residues.isEmpty {
@@ -426,6 +439,22 @@ struct AppsView: View {
                     }
                     .padding(.bottom, 6)
                 }
+            }
+        }
+        .confirmationDialog("Uninstall Application?", isPresented: .init(
+            get: { pendingUninstall != nil },
+            set: { if !$0 { pendingUninstall = nil } }
+        ), titleVisibility: .visible) {
+            Button("Uninstall App & Clean Leftovers", role: .destructive) {
+                if let target = pendingUninstall {
+                    Task { await app.uninstall(target) }
+                }
+                pendingUninstall = nil
+            }
+            Button("Cancel", role: .cancel) { pendingUninstall = nil }
+        } message: {
+            if let target = pendingUninstall {
+                Text("App: \(target.name)\nTotal Reclaimable: \(fmtBytes(target.totalSize)) across \(target.residues.count + 1) items.")
             }
         }
         .task {
