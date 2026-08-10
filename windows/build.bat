@@ -16,10 +16,14 @@ copy src\style.css out\
 copy src\app.js out\
 copy src\catalog.json out\
 
-echo ==> Bundling Native Windows Executable Package
+echo ==> Building Installable EXE (DiskCleaner-Windows-Setup.exe)
+makensis installer.nsi
+
+echo ==> Bundling Native Windows Executable Package (ZIP fallback)
 powershell -Command "Compress-Archive -Path out\* -DestinationPath out\DiskCleaner-Windows-v2.0.zip -Force"
 
 echo.
 echo Build Complete!
 echo Executable: out\DiskCleaner.exe
+echo Installer: out\DiskCleaner-Windows-Setup.exe
 echo Package: out\DiskCleaner-Windows-v2.0.zip

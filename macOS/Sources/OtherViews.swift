@@ -141,70 +141,30 @@ struct ActivityView: View {
     @State private var pendingQuit: ProcInfo?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 10) {
+        VStack(alignment: .leading, spacing: 14) {
+            // Header Bar
+            HStack(spacing: 12) {
                 Button { app.loadActivity() } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
+                    Label("Refresh Activity", systemImage: "arrow.clockwise")
                 }
+                .glassButton()
                 .disabled(app.activityLoading)
+
                 if app.activityLoading {
                     ProgressView().controlSize(.small)
-                    Text("sampling energy…").font(.system(size: 11))
+                    Text("Sampling energy & ports…").font(.system(size: 11.5))
                         .foregroundStyle(Color.inkSecondary)
                 }
-                Toggle("auto-refresh", isOn: Binding(
+
+                Toggle("Auto-Refresh", isOn: Binding(
                     get: { app.autoRefresh },
                     set: { app.setAutoRefresh($0) }
                 ))
-                .toggleStyle(.checkbox).font(.system(size: 12))
+                .toggleStyle(.switch)
+                .font(.system(size: 12))
+
                 Spacer()
-                Text(app.activityStamp).font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
-            }
 
-            SectionHeader(title: "Listening ports", trailing: "\(app.ports.count) listening")
-            if app.ports.isEmpty {
-                Text("Nothing is listening.").font(.system(size: 12.5))
-                    .foregroundStyle(Color.inkSecondary).frame(maxWidth: .infinity).padding(.vertical, 18)
-            }
-            ForEach(app.ports) { p in
-                HStack(spacing: 11) {
-                    Text("\(p.port)")
-                        .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                        .frame(minWidth: 52)
-                        .padding(.horizontal, 8).padding(.vertical, 5)
-                        .background(RoundedRectangle(cornerRadius: 7)
-                            .fill(p.isLocal ? Color.sunk : Color.riskReview.opacity(0.13)))
-                        .foregroundStyle(p.isLocal ? Color.primary : Color.riskReview)
-
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text(p.name).font(.system(size: 13, weight: .medium))
-                        Text("pid \(p.pid) · \(p.user) · \(p.addr)")
-                            .font(.system(size: 11)).foregroundStyle(Color.inkSecondary)
-                    }
-                    Spacer(minLength: 8)
-                    Text(p.isLocal ? "local only" : "reachable")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(Color.inkSecondary)
-                    if p.protected {
-                        Text("protected").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.inkSecondary)
-                    } else {
-                        Button("Quit") {
-                            pendingQuit = ProcInfo(pid: p.pid, name: p.name, user: p.user,
-                                                   cpu: 0, rss: 0, mine: true, protected: false)
-                        }
-                        .controlSize(.small).tint(.riskReview)
-                    }
-                }
-                .padding(.horizontal, 13).padding(.vertical, 9)
-                .glassSurface(radius: 11)
-                .padding(.bottom, 6)
-            }
-
-            HStack {
-                SectionHeader(title: "Top processes by memory",
-                              trailing: fmtBytes(app.procs.reduce(0) { $0 + $1.rss }) + " resident")
-                Spacer()
                 Button("⚡ Purge RAM Cache") {
                     _ = Shell.bash("/usr/bin/purge")
                     app.say("Inactive system RAM cache purged!")
@@ -213,42 +173,132 @@ struct ActivityView: View {
                 .glassButton(prominent: true)
                 .tint(.brand)
             }
-            .padding(.bottom, 6)
 
-            ForEach(app.procs) { p in
-                HStack(spacing: 11) {
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: 6) {
-                            Text(p.name).font(.system(size: 13, weight: .semibold))
-                                .lineLimit(1).truncationMode(.middle)
-                            if p.rss > 500 * 1024 * 1024 {
-                                Text("🚨 RAM HOG")
-                                    .font(.system(size: 9, weight: .bold))
-                                    .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Color.riskReview.opacity(0.2), in: Capsule())
-                                    .foregroundStyle(Color.riskReview)
+            // 2-Column Balanced Grid Layout (Listening Ports | Top Memory Processes)
+            HStack(alignment: .top, spacing: 16) {
+                // Left Column: Listening Ports Panel
+                VStack(alignment: .leading, spacing: 10) {
+                    SectionHeader(title: "Listening Ports", trailing: "\(app.ports.count) Active")
+
+                    if app.ports.isEmpty {
+                        Card {
+                            Text("No background ports listening.")
+                                .font(.system(size: 12.5))
+                                .foregroundStyle(Color.secondary)
+                                .frame(maxWidth: .infinity, alignment: .center)
+                                .padding(.vertical, 32)
+                        }
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 8) {
+                                ForEach(app.ports) { p in
+                                    HStack(spacing: 12) {
+                                        Text(processIcon(p.name))
+                                            .font(.system(size: 18))
+                                            .frame(width: 32, height: 32)
+                                            .background(Color.brand.opacity(0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            HStack(spacing: 6) {
+                                                Text(p.name).font(.system(size: 13, weight: .bold))
+                                                    .foregroundStyle(.white)
+                                                    .lineLimit(1)
+                                                Text(":\(p.port)")
+                                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                                    .padding(.horizontal, 5).padding(.vertical, 1)
+                                                    .background(Color.brand.opacity(0.2), in: RoundedRectangle(cornerRadius: 5))
+                                                    .foregroundStyle(Color.brand)
+                                            }
+                                            Text("PID \(p.pid) · \(p.user)")
+                                                .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
+                                        }
+
+                                        Spacer(minLength: 4)
+
+                                        Text(p.isLocal ? "LOCAL ONLY" : "REACHABLE")
+                                            .font(.system(size: 8.5, weight: .bold)).tracking(0.5)
+                                            .padding(.horizontal, 6).padding(.vertical, 2.5)
+                                            .background(p.isLocal ? Color.white.opacity(0.08) : Color.riskReview.opacity(0.2), in: Capsule())
+                                            .foregroundStyle(p.isLocal ? Color.inkSecondary : Color.riskReview)
+
+                                        if !p.protected {
+                                            Button("Quit") {
+                                                pendingQuit = ProcInfo(pid: p.pid, name: p.name, user: p.user,
+                                                                       cpu: 0, rss: 0, mine: true, protected: false)
+                                            }
+                                            .controlSize(.small).tint(.riskReview)
+                                        }
+                                    }
+                                    .padding(.horizontal, 12).padding(.vertical, 9)
+                                    .glassSurface(radius: 11)
+                                }
                             }
                         }
-                        Text("pid \(p.pid) · \(p.user)")
-                            .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
-                    }
-                    Spacer(minLength: 8)
-                    stat(fmtBytes(p.rss), "memory")
-                    stat(String(format: "%.1f%%", p.cpu), "cpu")
-                    if p.protected {
-                        Text("protected").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.inkSecondary).frame(width: 62)
-                    } else if p.mine {
-                        Button("Kill Process") { pendingQuit = p }
-                            .controlSize(.small).tint(.riskReview).frame(width: 76)
-                    } else {
-                        Text("other user").font(.system(size: 10, weight: .semibold))
-                            .foregroundStyle(Color.inkSecondary).frame(width: 62)
                     }
                 }
-                .padding(.horizontal, 13).padding(.vertical, 9)
-                .glassSurface(radius: 11)
-                .padding(.bottom, 6)
+                .frame(maxWidth: .infinity)
+
+                // Right Column: Top Memory Processes Panel
+                VStack(alignment: .leading, spacing: 10) {
+                    SectionHeader(title: "Top Processes by Memory",
+                                  trailing: fmtBytes(app.procs.reduce(0) { $0 + $1.rss }) + " Resident")
+
+                    ScrollView {
+                        VStack(spacing: 8) {
+                            ForEach(app.procs) { p in
+                                HStack(spacing: 12) {
+                                    Text(processIcon(p.name))
+                                        .font(.system(size: 18))
+                                        .frame(width: 32, height: 32)
+                                        .background(Color.brand.opacity(0.18), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        HStack(spacing: 5) {
+                                            Text(p.name).font(.system(size: 13, weight: .bold))
+                                                .foregroundStyle(.white)
+                                                .lineLimit(1).truncationMode(.middle)
+                                            if p.rss > 500 * 1024 * 1024 {
+                                                Text("🚨 RAM HOG")
+                                                    .font(.system(size: 8, weight: .bold))
+                                                    .padding(.horizontal, 5).padding(.vertical, 1.5)
+                                                    .background(Color.riskReview.opacity(0.2), in: Capsule())
+                                                    .foregroundStyle(Color.riskReview)
+                                            }
+                                        }
+                                        Text("PID \(p.pid) · \(p.user)")
+                                            .font(.system(size: 10.5)).foregroundStyle(Color.inkSecondary)
+                                    }
+
+                                    Spacer(minLength: 4)
+
+                                    VStack(alignment: .trailing, spacing: 2) {
+                                        Text(fmtBytes(p.rss))
+                                            .font(.system(size: 12, weight: .bold)).monospacedDigit()
+                                            .foregroundStyle(.white)
+                                        Text(String(format: "%.1f%% CPU", p.cpu))
+                                            .font(.system(size: 10)).foregroundStyle(Color.inkSecondary)
+                                    }
+
+                                    Group {
+                                        if p.protected {
+                                            Text("protected").font(.system(size: 9.5, weight: .semibold))
+                                                .foregroundStyle(Color.inkSecondary).frame(width: 54)
+                                        } else if p.mine {
+                                            Button("Kill") { pendingQuit = p }
+                                                .controlSize(.small).tint(.riskReview).frame(width: 54)
+                                        } else {
+                                            Text("other").font(.system(size: 9.5, weight: .semibold))
+                                                .foregroundStyle(Color.inkSecondary).frame(width: 54)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 12).padding(.vertical, 9)
+                                .glassSurface(radius: 11)
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
         }
         .confirmationDialog("Quit this process?",
@@ -266,6 +316,19 @@ struct ActivityView: View {
             }
         }
         .onAppear { app.loadActivity() }
+    }
+
+    private func processIcon(_ name: String) -> String {
+        let lower = name.lowercased()
+        if lower.contains("chrome") { return "🌐" }
+        if lower.contains("node") { return "🟢" }
+        if lower.contains("whatsapp") { return "💬" }
+        if lower.contains("python") { return "🐍" }
+        if lower.contains("mysql") || lower.contains("redis") || lower.contains("postgres") { return "🗄️" }
+        if lower.contains("code") || lower.contains("xcode") || lower.contains("electron") { return "💻" }
+        if lower.contains("claude") || lower.contains("kilo") || lower.contains("controlce") { return "🤖" }
+        if lower.contains("adb") || lower.contains("android") { return "🤖" }
+        return "⚙️"
     }
 
     private func stat(_ value: String, _ caption: String) -> some View {

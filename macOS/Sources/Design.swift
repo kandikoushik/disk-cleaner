@@ -26,17 +26,12 @@ extension Color {
 
     static let hairline = Color.dynamic(light: "e6eaf1", dark: "222a36")
     static let track    = Color.dynamic(light: "eaeef5", dark: "222a36")
-    /// Distinct from `track` so an unused/free segment still reads as a segment.
     static let neutralFill = Color.dynamic(light: "d3dae6", dark: "2c3644")
     static let sunk     = Color.dynamic(light: "f7f9fc", dark: "0f141d")
 
-    // SwiftUI's .secondary and .tertiary measure 3.26:1 and 1.84:1 against a
-    // light surface — both below the 4.5:1 minimum for body text. These are
-    // stepped to clear it: 7.7:1 and 4.7:1.
     static let inkSecondary = Color.dynamic(light: "4a5462", dark: "aab4c2")
     static let inkTertiary  = Color.dynamic(light: "6b7583", dark: "8d97a5")
 
-    /// Categorical slot 1–8.
     static func series(_ slot: Int) -> Color {
         let light = ["2a78d6", "eb6834", "1baf7a", "eda100",
                      "e87ba4", "008300", "4a3aa7", "e34948"]
@@ -73,31 +68,36 @@ extension Risk {
 
 /// Free-space ring. The lighter arc previews what the current selection frees.
 struct GaugeRing: View {
-    let used: Double          // 0…1
-    let saving: Double        // 0…1, part of `used` that would be freed
+    let used: Double
+    let saving: Double
     let label: String
     let caption: String
+    var size: CGFloat = 122
 
     var body: some View {
+        let strokeWidth = size * (11.0 / 122.0)
+        let fontSize = size * (23.0 / 122.0)
+        let captionSize = size * (9.5 / 122.0)
+
         ZStack {
-            Circle().stroke(Color.white.opacity(0.22), lineWidth: 11)
+            Circle().stroke(Color.brand.opacity(0.25), lineWidth: strokeWidth)
             Circle()
                 .trim(from: 0, to: used)
-                .stroke(Color.white.opacity(0.5), style: .init(lineWidth: 11, lineCap: .round))
+                .stroke(LinearGradient(colors: [.brand, .brand2], startPoint: .top, endPoint: .bottom), style: .init(lineWidth: strokeWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
             Circle()
                 .trim(from: 0, to: max(0, used - saving))
-                .stroke(.white, style: .init(lineWidth: 11, lineCap: .round))
+                .stroke(Color.riskSafe, style: .init(lineWidth: strokeWidth, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(.easeInOut(duration: 0.8), value: used - saving)
-            VStack(spacing: 2) {
-                Text(label).font(.system(size: 23, weight: .bold)).monospacedDigit()
-                Text(caption).font(.system(size: 9.5, weight: .semibold))
+            VStack(spacing: 1) {
+                Text(label).font(.system(size: max(11, fontSize), weight: .bold)).monospacedDigit()
+                Text(caption).font(.system(size: max(7, captionSize), weight: .semibold))
                     .tracking(1).opacity(0.85)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.primary)
         }
-        .frame(width: 122, height: 122)
+        .frame(width: size, height: size)
     }
 }
 
@@ -112,23 +112,45 @@ struct StackedBar: View {
     let segments: [StackSegment]
     var height: CGFloat = 24
 
+    @State private var hoveredId: String? = nil
+
     var total: Int64 { max(segments.reduce(0) { $0 + $1.size }, 1) }
 
     var body: some View {
         GeometryReader { geo in
-            // The 2px gaps are real width. Budgeting only for the segments and
-            // then adding gaps on top overflows the card — subtract the gaps and
-            // the per-segment minimum from the width being divided up.
             let gaps = CGFloat(max(0, segments.count - 1)) * 2
             let minima = CGFloat(segments.count) * 2
             let usable = max(0, geo.size.width - gaps - minima)
 
             HStack(spacing: 2) {
                 ForEach(segments) { s in
-                    RoundedRectangle(cornerRadius: 2, style: .continuous)
+                    let pct = (Double(s.size) / Double(total)) * 100
+                    RoundedRectangle(cornerRadius: 3, style: .continuous)
                         .fill(s.color)
                         .frame(width: 2 + usable * CGFloat(s.size) / CGFloat(total))
-                        .help("\(s.id) — \(fmtBytes(s.size))")
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                .strokeBorder(hoveredId == s.id ? Color.white : Color.clear, lineWidth: 1.5)
+                        )
+                        .onHover { isHovered in
+                            hoveredId = isHovered ? s.id : nil
+                        }
+                        .popover(isPresented: Binding(
+                            get: { hoveredId == s.id },
+                            set: { if !$0 { hoveredId = nil } }
+                        ), arrowEdge: .bottom) {
+                            HStack(spacing: 8) {
+                                Circle().fill(s.color).frame(width: 10, height: 10)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(s.id)
+                                        .font(.system(size: 12, weight: .bold))
+                                    Text("\(fmtBytes(s.size)) · \(String(format: "%.1f%%", pct)) of disk")
+                                        .font(.system(size: 11))
+                                        .foregroundStyle(Color.secondary)
+                                }
+                            }
+                            .padding(.horizontal, 12).padding(.vertical, 8)
+                        }
                 }
             }
             .frame(width: geo.size.width, height: height, alignment: .leading)
@@ -227,10 +249,8 @@ struct GlassSurface: ViewModifier {
         if #available(macOS 26.0, *) {
             content
                 .background(
-                    // A faint opaque layer under the glass: pure glass over a
-                    // pale backdrop left small text without stable ground.
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .fill(Color(nsColor: .textBackgroundColor).opacity(0.55))
+                        .fill(Color(nsColor: .controlBackgroundColor).opacity(0.45))
                 )
                 .glassEffect(
                     selected ? .regular.tint(.brand.opacity(0.22)).interactive()
@@ -239,18 +259,18 @@ struct GlassSurface: ViewModifier {
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .strokeBorder(selected ? Color.brand.opacity(0.7) : Color.clear,
+                        .strokeBorder(selected ? Color.brand.opacity(0.7) : Color.primary.opacity(0.08),
                                       lineWidth: 1)
                 )
         } else {
             content
                 .background(
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .fill(Color(nsColor: .controlBackgroundColor))
+                        .fill(Color(nsColor: .controlBackgroundColor).opacity(0.45))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .strokeBorder(selected ? Color.brand : Color.hairline, lineWidth: 1)
+                        .strokeBorder(selected ? Color.brand : Color.primary.opacity(0.08), lineWidth: 1)
                 )
         }
     }

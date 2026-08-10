@@ -160,15 +160,18 @@ enum SystemInfo {
     /// set one; `Picture` is only a path to a stock image, so it is the
     /// fallback rather than the primary source.
     static func avatar(for user: String) -> Data? {
-        if let hex = dscl(user, "JPEGPhoto") {
-            let cleaned = hex.filter { $0.isHexDigit }
+        if let raw = Shell.run("/usr/bin/dscl", [".", "-read", "/Users/\(user)", "JPEGPhoto"]) {
+            let hex = raw.replacingOccurrences(of: "JPEGPhoto:", with: "")
+                         .filter { $0.isHexDigit }
             var bytes = [UInt8]()
-            bytes.reserveCapacity(cleaned.count / 2)
-            var index = cleaned.startIndex
-            while let next = cleaned.index(index, offsetBy: 2, limitedBy: cleaned.endIndex),
-                  next <= cleaned.endIndex {
-                if let byte = UInt8(cleaned[index..<next], radix: 16) { bytes.append(byte) }
-                index = next
+            bytes.reserveCapacity(hex.count / 2)
+            var index = hex.startIndex
+            while index < hex.endIndex {
+                let nextIndex = hex.index(index, offsetBy: 2, limitedBy: hex.endIndex) ?? hex.endIndex
+                if index < nextIndex, let byte = UInt8(hex[index..<nextIndex], radix: 16) {
+                    bytes.append(byte)
+                }
+                index = nextIndex
             }
             if bytes.count > 100 { return Data(bytes) }
         }
