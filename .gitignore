@@ -7,6 +7,8 @@ out/
 
 # Screenshots / scratch
 *.png
+!docs/*.png
+!macOS/Resources/AppIcon.png
 
 # macOS clutter
 .DS_Store
