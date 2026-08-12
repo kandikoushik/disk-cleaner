@@ -5,29 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Primary Meta Tags -->
-  <title>Disk Cleaner — The Ultimate Open-Source Native Disk Utility for macOS</title>
-  <meta name="title" content="Disk Cleaner — The Ultimate Open-Source Native Disk Utility for macOS">
-  <meta name="description" content="100% Free & Open-Source native disk cleaner, storage optimizer, duplicate finder, and app uninstaller for macOS. Zero tracking, single Swift binary, parallel TaskGroup speed.">
-  <meta name="keywords" content="Mac disk cleaner, open source Mac cleaner, CleanMyMac alternative, system optimizer, duplicate file finder, app uninstaller, native Swift disk utility, macOS storage cleaner, DaisyDisk alternative">
+  <title>Disk Cleaner — The Ultimate Open-Source Multiplatform System Utility</title>
+  <meta name="title" content="Disk Cleaner — The Ultimate Open-Source Multiplatform System Utility">
+  <meta name="description" content="100% Free & Open-Source disk cleaner, storage optimizer, duplicate finder, and app uninstaller for macOS, iOS, Android & Windows. Zero tracking, single native binary, parallel speed.">
+  <meta name="keywords" content="Mac disk cleaner, open source Mac cleaner, CleanMyMac alternative, system optimizer, duplicate file finder, app uninstaller, native Swift disk utility, iOS storage cleaner, Android cleaner, Windows storage utility">
   <meta name="author" content="Koushik Kandi">
   <meta name="theme-color" content="#0b0f19">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://kandikoushik.github.io/disk-cleaner/">
-  <meta property="og:title" content="Disk Cleaner — The Ultimate Open-Source Native Disk Utility for macOS">
-  <meta property="og:description" content="Recover 40+ GB in seconds. 100% Open-Source native Swift app with zero background telemetry, deep app uninstaller, 3-pass hash duplicate finder, and parallel sizing.">
-  <meta property="og:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/macOS/Sources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png">
+  <meta property="og:title" content="Disk Cleaner — The Ultimate Open-Source Multiplatform Utility">
+  <meta property="og:description" content="Recover tens of gigabytes in seconds. 100% Open-Source multiplatform storage optimizer for macOS, iOS, Android, and Windows with zero background tracking.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/docs/app-icon.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://kandikoushik.github.io/disk-cleaner/">
-  <meta property="twitter:title" content="Disk Cleaner — Best Open-Source Mac Storage Optimizer">
-  <meta property="twitter:description" content="100% Free & Open-Source native disk cleaner, storage optimizer, and system utility for macOS. Single Swift binary, no tracking.">
-  <meta property="twitter:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/macOS/Sources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png">
+  <meta property="twitter:title" content="Disk Cleaner — Best Open-Source System Utility">
+  <meta property="twitter:description" content="100% Free & Open-Source native disk cleaner, storage optimizer, and system utility for macOS, iOS, Android, and Windows. Single native binary, no tracking.">
+  <meta property="twitter:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/docs/app-icon.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+  <link rel="icon" type="image/png" href="app-icon.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Disk Cleaner",
-    "operatingSystem": "macOS 14.0+",
+    "operatingSystem": "macOS 14.0+, iOS 17.0+, Android, Windows 11",
     "applicationCategory": "UtilitiesApplication",
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "offers": {
@@ -48,13 +48,13 @@
       "price": "0",
       "priceCurrency": "USD"
     },
-    "description": "Native macOS disk cleanup, storage optimizer, app uninstaller, and duplicate file finder built in Swift.",
+    "description": "Native multiplatform disk cleanup, storage optimizer, app uninstaller, and duplicate file finder for macOS, iOS, Android, and Windows.",
     "author": {
       "@type": "Person",
       "name": "Koushik Kandi",
       "url": "https://github.com/kandikoushik"
     },
-    "downloadUrl": "https://github.com/kandikoushik/disk-cleaner/releases"
+    "downloadUrl": "https://github.com/kandikoushik/disk-cleaner/releases/download/v2.0.0/DiskCleaner-2.0.dmg"
   }
   </script>
 
@@ -118,7 +118,7 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border-color);
-      padding: 16px 0;
+      padding: 14px 0;
     }
 
     .nav-container {
@@ -135,18 +135,13 @@
       color: var(--text-main);
       font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
     }
 
-    .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
+    .brand img.app-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
       box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
     }
 
@@ -190,9 +185,22 @@
 
     /* Hero Section */
     header.hero {
-      padding: 160px 0 100px;
+      padding: 160px 0 90px;
       text-align: center;
       position: relative;
+    }
+
+    .hero-icon-wrapper {
+      margin-bottom: 24px;
+      display: inline-block;
+      position: relative;
+    }
+
+    .hero-icon-wrapper img {
+      width: 100px;
+      height: 100px;
+      border-radius: 22px;
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.4), 0 0 80px rgba(6, 182, 212, 0.2);
     }
 
     .badge-pill {
@@ -229,7 +237,7 @@
     }
 
     .hero-subtitle {
-      max-width: 760px;
+      max-width: 780px;
       margin: 0 auto 40px;
       font-size: 1.2rem;
       color: var(--text-muted);
@@ -241,17 +249,17 @@
       justify-content: center;
       gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 60px;
+      margin-bottom: 50px;
     }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--accent-emerald), var(--accent-cyan));
       color: #07090e;
       font-weight: 700;
-      padding: 14px 32px;
+      padding: 16px 36px;
       border-radius: 12px;
       text-decoration: none;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -261,17 +269,17 @@
 
     .btn-primary:hover {
       transform: translateY(-3px);
-      box-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 45px rgba(16, 185, 129, 0.55);
     }
 
     .btn-secondary {
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-main);
       font-weight: 600;
-      padding: 14px 32px;
+      padding: 16px 36px;
       border-radius: 12px;
       text-decoration: none;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       border: 1px solid var(--border-color);
       display: inline-flex;
       align-items: center;
@@ -325,14 +333,72 @@
       font-weight: 500;
     }
 
+    /* Multiplatform Section */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .platform-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .platform-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(6, 182, 212, 0.4);
+      transform: translateY(-5px);
+    }
+
+    .platform-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .platform-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-macos { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-ios { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
+    .badge-android { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+    .badge-windows { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+    .platform-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .platform-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
     /* Section Styling */
     section {
-      padding: 100px 0;
+      padding: 90px 0;
     }
 
     .section-title {
       text-align: center;
-      margin-bottom: 60px;
+      margin-bottom: 50px;
     }
 
     .section-title h2 {
@@ -635,10 +701,11 @@
   <nav>
     <div class="container nav-container">
       <a href="#" class="brand">
-        <div class="brand-icon">🚀</div>
+        <img src="app-icon.png" alt="Disk Cleaner App Icon" class="app-logo-icon">
         <span>Disk Cleaner</span>
       </a>
       <ul class="nav-links">
+        <li><a href="#ecosystem">Platforms</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#comparison">Comparison</a></li>
         <li><a href="#safety">Safety</a></li>
@@ -656,19 +723,23 @@
   <!-- Hero Header -->
   <header class="hero">
     <div class="container">
+      <div class="hero-icon-wrapper">
+        <img src="app-icon.png" alt="Disk Cleaner Native Logo">
+      </div>
+      <br>
       <div class="badge-pill">
-        ⚡ 100% Free & Open Source • Apache 2.0 License • macOS 14+
+        ⚡ 100% Free & Open Source • Apache 2.0 License • macOS, iOS, Android & Windows
       </div>
       <h1>
         Recover Tens of Gigabytes.<br><span>Privately & Blazingly Fast.</span>
       </h1>
       <p class="hero-subtitle">
-        The best open-source native Mac disk cleaner & system optimizer. Built in pure Swift with parallel TaskGroup sizing, content-hash duplicate detection, deep app uninstallation, and zero background telemetry.
+        The best open-source native multiplatform storage optimizer. Built in pure Swift for macOS & iOS with parallel TaskGroup sizing, content-hash duplicate detection, deep app uninstallation, and zero background telemetry.
       </p>
       
       <div class="hero-cta">
-        <a href="https://github.com/kandikoushik/disk-cleaner/releases" target="_blank" class="btn-primary">
-          <span>Download DMG</span>
+        <a href="https://github.com/kandikoushik/disk-cleaner/releases/download/v2.0.0/DiskCleaner-2.0.dmg" class="btn-primary">
+          <span>Download macOS DMG (v2.0)</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </a>
         <a href="https://github.com/kandikoushik/disk-cleaner" target="_blank" class="btn-secondary">
@@ -692,12 +763,56 @@
           <div class="stat-label">Network Telemetry (100% Offline)</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Native Swift Binary</div>
+          <div class="stat-number">4</div>
+          <div class="stat-label">Supported Platforms</div>
         </div>
       </div>
     </div>
   </header>
+
+  <!-- Ecosystem Section -->
+  <section id="ecosystem">
+    <div class="container">
+      <div class="section-title">
+        <h2>Multiplatform Ecosystem</h2>
+        <p>Tailored native engines providing storage insights and cleanup across all your devices.</p>
+      </div>
+
+      <div class="platform-grid">
+        <div class="platform-card">
+          <div class="platform-header">
+            <h3>macOS Native</h3>
+            <span class="platform-badge badge-macos">v2.0 Stable</span>
+          </div>
+          <p>Single Swift binary with SwiftUI & Liquid Glass interface. Features ~30 smart target scanning, parallel TaskGroup sizing, 3-pass SHA-256 duplicate hashing, and Spotlight/LaunchServices repair.</p>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-header">
+            <h3>iOS App</h3>
+            <span class="platform-badge badge-ios">SwiftUI Companion</span>
+          </div>
+          <p>Mobile photo & video duplicate detection, cache diagnostic insight, and local device storage breakdown built in pure Swift for iPhone and iPad.</p>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-header">
+            <h3>Android</h3>
+            <span class="platform-badge badge-android">Kotlin SDK</span>
+          </div>
+          <p>Storage analyzer and junk APK purge engine built with modern Kotlin architecture for Android smartphones and tablets.</p>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-header">
+            <h3>Windows</h3>
+            <span class="platform-badge badge-windows">C# / PowerShell</span>
+          </div>
+          <p>High-speed Windows Temp, Prefetch, WinSxS, and browser cache cleaner engine integrated with PowerShell automation scripts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- Features Section -->
   <section id="features">
@@ -808,6 +923,14 @@
               <td class="check-no">Freemium</td>
             </tr>
             <tr>
+              <td><strong>Multiplatform Ecosystem</strong></td>
+              <td class="highlight-col check-yes">✅ macOS, iOS, Android, Windows</td>
+              <td class="check-no">❌ macOS Only</td>
+              <td class="check-no">❌ macOS Only</td>
+              <td class="check-no">❌ macOS Only</td>
+              <td>Windows/Mac</td>
+            </tr>
+            <tr>
               <td><strong>Zero Network Telemetry</strong></td>
               <td class="highlight-col check-yes">✅ 100% Offline</td>
               <td class="check-no">❌ Background Analytics</td>
@@ -834,14 +957,6 @@
             <tr>
               <td><strong>3-Pass Duplicate Hash</strong></td>
               <td class="highlight-col check-yes">✅ Size → Head → SHA256</td>
-              <td class="check-yes">✅ Included</td>
-              <td class="check-no">❌ No</td>
-              <td class="check-no">❌ No</td>
-              <td>Basic</td>
-            </tr>
-            <tr>
-              <td><strong>Deep App Residue Finder</strong></td>
-              <td class="highlight-col check-yes">✅ Caches, LaunchAgents</td>
               <td class="check-yes">✅ Included</td>
               <td class="check-no">❌ No</td>
               <td class="check-no">❌ No</td>

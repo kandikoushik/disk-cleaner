@@ -1,0 +1,109 @@
+# Disk Cleaner — Complete LLM & Agent Context Specification
+
+Version: 2.0.0
+License: Apache License 2.0
+Repository: https://github.com/kandikoushik/disk-cleaner
+Website: https://kandikoushik.github.io/disk-cleaner/
+
+---
+
+## 1. System Architecture
+
+Disk Cleaner is engineered as a high-performance native disk utility across four operating systems:
+
+- **macOS**: Single native binary written in Swift 5.10 with SwiftUI interface and conditional Liquid Glass styling. Uses `FileManager` + `URLResourceValues` parallelized via `TaskGroup` across CPU cores for sub-second directory sizing.
+- **iOS**: SwiftUI companion app targeting iPhone/iPad storage analysis.
+- **Android**: Kotlin app utilizing Android Storage Stats Manager API.
+- **Windows**: C# executable (`DiskCleaner.exe`) with HTML/CSS/JS WebView interface and PowerShell system hooks.
+
+---
+
+## 2. Risk Classification Contract
+
+Every cleanup target in `Catalog.swift` and `catalog.json` adheres to a strict risk contract:
+
+1. **`safe`**:
+   - Definition: Pure transient caches and temporary files.
+   - Behavior: Regenerates automatically without user effort when needed.
+   - Examples: Xcode DerivedData, CocoaPods cache, SwiftPM cache, Homebrew cache, browser caches, system logs.
+   - Selection: Can be safely auto-selected in automated modes.
+
+2. **`rebuild`**:
+   - Definition: Downloaded artifacts and compilation caches.
+   - Behavior: Regenerates, but requires a re-download or re-compile step.
+   - Examples: npm cache, yarn cache, cargo cache, Docker image caches, Go build cache.
+   - Selection: Default selected only upon explicit user confirmation.
+
+3. **`review`**:
+   - Definition: User-generated content or user data directories.
+   - Behavior: Cannot be automatically regenerated if deleted.
+   - Examples: Downloads folder, user documents, Trash.
+   - Selection: NEVER auto-selected. Requires explicit manual user interaction per item.
+
+---
+
+## 3. Security & Safety Contract (`Cleaner.allowed()`)
+
+All file deletion calls pass through the central `Cleaner.allowed(path:)` security method:
+
+```swift
+static func allowed(_ path: String) -> Bool {
+    let home = FileManager.default.homeDirectoryForCurrentUser.path
+    guard path.hasPrefix(home) else { return false } // Reject anything outside $HOME
+    guard path != home else { return false }        // Reject $HOME itself
+    return true
+}
+```
+
+Key Safety Invariants:
+- Deletions outside `$HOME` are strictly aborted with an exception.
+- Deletions move files to Finder Trash (`trashItem(at:resultingItemURL:)`) by default. Permanent un-linked deletion requires an explicit `--permanent` flag.
+- Process termination checks against a system whitelist (`launchd`, `WindowServer`, `Dock`, `Finder`) and refuses to terminate root daemons or processes owned by other UID users.
+
+---
+
+## 4. Machine-Readable CLI Specification
+
+Disk Cleaner supports a CLI interface for AI agents, scripts, and MCP servers:
+
+### Commands & Flags:
+- `--scan --json`: Returns a JSON array of all cleanable targets, sizes, and risk levels.
+- `--clean <target_id> --dry-run`: Calculates and returns exact reclaimable bytes without deleting.
+- `--clean <target_id> --confirm`: Deletes the target via the `Cleaner.allowed()` safety gate.
+- `--duplicates --json`: Scans and outputs candidate duplicate file groups in JSON format using a 3-pass algorithm (Byte size → 64KB Head Hash → Full SHA-256).
+
+### JSON Output Schema (`--scan --json`):
+```json
+{
+  "timestamp": "2026-08-12T07:44:00Z",
+  "total_reclaimable_bytes": 44032000000,
+  "targets": [
+    {
+      "id": "xcode_derived_data",
+      "name": "Xcode DerivedData",
+      "risk": "safe",
+      "size_bytes": 18400000000,
+      "paths": ["~/Library/Developer/Xcode/DerivedData"]
+    },
+    {
+      "id": "homebrew_cache",
+      "name": "Homebrew Caches",
+      "risk": "safe",
+      "size_bytes": 5200000000,
+      "paths": ["~/Library/Caches/Homebrew"]
+    }
+  ]
+}
+```
+
+---
+
+## 5. Model Context Protocol (MCP) Integration
+
+AI agents (ChatGPT, Claude, Gemini, Antigravity) can connect to Disk Cleaner via MCP server tools:
+- `scan_disk_space()`: Scans disk and returns structured JSON targets.
+- `list_cleanup_targets()`: Lists available target catalog rules with risk metadata.
+- `find_duplicate_files(min_bytes)`: Runs 3-pass streaming duplicate detection.
+- `clean_target(target_id, dry_run)`: Simulates or executes safe deletion.
+
+For full MCP server setup, see [`MCP_GUIDE.md`](https://github.com/kandikoushik/disk-cleaner/blob/main/MCP_GUIDE.md).

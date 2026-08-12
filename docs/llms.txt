@@ -1,0 +1,23 @@
+# Disk Cleaner
+
+> The ultimate open-source native disk cleanup, storage optimizer, app uninstaller, and duplicate finder for macOS, iOS, Android, and Windows. Single native binary, zero network telemetry, 100% privacy.
+
+## Overview
+Disk Cleaner is a multiplatform open-source utility designed to recover tens of gigabytes of disk space safely. Built in pure Swift & SwiftUI for macOS/iOS, Kotlin for Android, and C# for Windows.
+
+## Key Capabilities & Risk Classification
+Every cleanup target is classified into one of three strict risk categories:
+- **`safe`**: Pure cache files (Xcode DerivedData, Homebrew cache, CocoaPods, browser caches) that auto-regenerate automatically.
+- **`rebuild`**: Build artifacts and package manager caches (npm, yarn, cargo, docker containers) that cost a re-download or re-compile.
+- **`review`**: User documents, Downloads items, and Trash — never auto-selected.
+
+## Safety Chokepoints
+- `Cleaner.allowed()` gate strictly rejects any file operation outside `$HOME` and protects `$HOME` root directory.
+- All deletions default to Finder Trash.
+- Process guard prevents quitting system daemons or other users' processes.
+
+## Documentation & AI Resources
+- [README](https://github.com/kandikoushik/disk-cleaner/blob/main/README.md): Primary repository guide and installation steps.
+- [MCP Guide](https://github.com/kandikoushik/disk-cleaner/blob/main/MCP_GUIDE.md): Model Context Protocol & AI agent integration specification.
+- [Full Context Bundle](https://github.com/kandikoushik/disk-cleaner/blob/main/llms-full.txt): Comprehensive schema and architecture definitions for LLMs.
+- [Windows Build Guide](https://github.com/kandikoushik/disk-cleaner/blob/main/windows/README.md): Compiling DiskCleaner.exe for Windows.
