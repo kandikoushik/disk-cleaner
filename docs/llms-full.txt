@@ -1,6 +1,6 @@
 # Disk Cleaner — Complete LLM & Agent Context Specification
 
-Version: 3.0.0
+Version: 4.0.0
 License: Apache License 2.0
 Repository: https://github.com/kandikoushik/disk-cleaner
 Website: https://kandikoushik.github.io/disk-cleaner/

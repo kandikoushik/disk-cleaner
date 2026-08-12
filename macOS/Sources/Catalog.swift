@@ -230,5 +230,18 @@ enum Catalog {
                note: "IntelliJ, PyCharm, WebStorm compile and index caches.",
                risk: .safe, category: .apps,
                source: .paths(["\(HOME)/Library/Caches/JetBrains/*"])),
+
+        // ---- v4.0 Container & System Additions ----
+        Target(id: "docker_volumes", label: "Docker & Podman Volume Purger",
+               note: "Prunes stopped containers, dangling images, and build caches.",
+               risk: .rebuild, category: .apps,
+               source: .command("docker system prune -af --volumes 2>/dev/null || true",
+                                measured: ["\(HOME)/.docker/buildx", "\(HOME)/Library/Containers/com.docker.docker"])),
+
+        Target(id: "cask_orphans", label: "Homebrew Cask Orphan Cleaner",
+               note: "Clears cached installer archives and orphaned cask downloads.",
+               risk: .safe, category: .packages,
+               source: .paths(["\(HOME)/Library/Caches/Homebrew/Casks/*"]))
     ]
 }
+

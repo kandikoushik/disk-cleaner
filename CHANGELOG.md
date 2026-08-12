@@ -7,32 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v4.0.0] - 2026-08-12
+
+### 🚀 Added
+- **Menu Bar Status Item (`macOS/Sources/App.swift`)**: Native macOS MenuBarExtra widget with live disk space monitoring and one-click quick clean shortcuts.
+- **Dynamic Custom JSON Plugin Target Engine (`PluginLoader.swift`)**: Scans and dynamically loads user custom cleanup rules from `~/.config/disk-cleaner/plugins/*.json`.
+- **Docker & Podman Volume Purger (`Catalog.swift`)**: Target rules for dangling volumes, stopped containers, and build caches (`docker system prune -af --volumes`).
+- **Xcode Simulator & Device Wiper (`Catalog.swift`)**: Deep purge for Xcode Swift Previews, Simulator caches, and iOS/watchOS/tvOS DeviceSupport files.
+- **Homebrew Cask Orphan Cleaner (`Catalog.swift`)**: Auto-purge orphaned Homebrew cask archives and downloads.
+- **Windows WinSxS DISM Component Store Analyzer (`windows/src/CleanerEngine.cs`)**: Added Component Store DISM analysis to `DiskCleaner.exe`.
+- **Background Auto-Cleanup Daemon Installer (`scripts/install_auto_clean_daemon.sh`)**: LaunchAgent script for weekly automated `.safe` tier cleaning.
+
+### ⚡ Changed
+- Upgraded version string to **`4.0.0`** (`DiskCleaner-4.0.dmg`).
+- Updated `ROADMAP.md` marking all milestones as **✅ Completed**.
+- Updated website and `README.md` download links to target `v4.0.0`.
+
+---
+
 ## [v3.0.0] - 2026-08-12
 
 ### 🚀 Added
-- **Apache 2.0 Open Source Licensing**: Official `LICENSE` file for community development.
-- **Multiplatform Ecosystem**:
-  - **macOS**: Native Swift 5.10 / SwiftUI app (`DiskCleaner-3.0.dmg`).
-  - **Windows**: Standalone `DiskCleaner.exe` executable and NSIS installer (`windows/build.bat`).
-  - **iOS**: SwiftUI storage diagnostics companion module.
-  - **Android**: Kotlin junk APK purge and storage analyzer.
-- **AI & MCP Agent Support**:
-  - `llms.txt` and `llms-full.txt` standard files adhering to llmstxt.org.
-  - `MCP_GUIDE.md` detailing Model Context Protocol server tools (`scan_disk_space`, `list_cleanup_targets`, `find_duplicate_files`).
-  - Machine-readable `--scan --json` and `--clean <target> --dry-run` CLI flags.
-- **GitHub Pages Website**: Live landing page at `https://kandikoushik.github.io/disk-cleaner/`.
-- **GitHub Actions CI/CD**:
-  - `.github/workflows/ci.yml`: Multiplatform build verification on PRs.
-  - `.github/workflows/release.yml`: Automated DMG & `.exe` packaging on version tags.
-- **Community Health & Documentation**: `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `ROADMAP.md`, `MARKETING_GUIDE.md`, and `.github/ISSUE_TEMPLATE/`.
-
-### ⚡ Changed
-- Upgraded version string from `2.0` to `3.0` across all platform build runners.
-- Updated root `build.sh` wrapper script.
-- Replaced emoji logo with high-res native AppIcon PNG across website and open-graph social cards.
-
-### 🗑️ Removed
-- Deleted legacy Python / WKWebView v1 prototype codebase (`legacy/` directory).
+- Apache 2.0 Open Source Licensing (`LICENSE`).
+- Multiplatform Ecosystem engines (macOS Swift, Windows `DiskCleaner.exe`, iOS, Android).
+- AI & MCP Model Context Protocol integration (`llms.txt`, `llms-full.txt`, `MCP_GUIDE.md`).
+- GitHub Pages landing page (`https://kandikoushik.github.io/disk-cleaner/`).
+- GitHub Actions CI/CD workflows (`ci.yml`, `release.yml`).
 
 ---
 
@@ -42,10 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Single native Swift 5.10 binary replacing v1 Python server shell.
 - Parallel directory sizing engine utilizing Swift `TaskGroup` across CPU cores.
 - 3-Pass streaming duplicate finder (Byte size → 64KB Head Hash → Full SHA-256).
-- Deep App Uninstaller finding hidden Application Support, Containers, and LaunchAgents.
-- System Maintenance scripts (Spotlight reindex, Launch Services rebuild, DNS flush).
-- Guarded process quit shield.
-- Conditional Liquid Glass UI for macOS Sonoma (14.0+).
 
 ---
 

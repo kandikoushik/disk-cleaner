@@ -1,36 +1,27 @@
 # Disk Cleaner — Open Source Project Roadmap
 
-This roadmap outlines the planned feature additions, multiplatform expansions, and technical milestones for **Disk Cleaner**.
+This roadmap tracks feature additions, multiplatform expansions, and technical milestones for **Disk Cleaner**.
 
 ---
 
-## 📍 Current Release: Version 3.0.0 (Apache 2.0 Open Source)
+## 🚀 Version 4.0.0 — Ecosystem Major Release (LIVE ✅)
 
-- ✅ Multiplatform native engines (macOS Swift, Windows C# `.exe`, iOS, Android).
-- ✅ AI & Model Context Protocol (MCP) server support with `llms.txt` standard.
-- ✅ High-performance GitHub Pages landing page.
-- ✅ Automated GitHub Actions CI/CD pipelines.
+All planned roadmap features have been built, verified, and released in **Version 4.0.0**:
 
----
-
-## 🎯 v3.1.0 — Developer & Tooling Expansion (Q3 2026)
-
-- [ ] **Xcode Simulator & Device Cache Wiper**: Dedicated one-click cleanup for iOS/watchOS/tvOS simulators and device support files (`~/Library/Developer/Xcode/iOS DeviceSupport`).
-- [ ] **Homebrew Cask Auto-Orphan Cleaner**: Detects and purges orphaned configurations left behind by uninstalled Homebrew casks.
-- [ ] **Menu Bar / System Tray Widget**: Optional lightweight menu bar status item displaying real-time disk pressure and quick-clean shortcuts.
-- [ ] **Windows WinSxS Component Store Analyzer**: Detailed component store breakdown for `C:\Windows\WinSxS` with DISM integration.
-
----
-
-## 🚀 v3.5.0 — Deep Analytics & Automation (Q4 2026)
-
-- [ ] **Scheduled Auto-Cleanup Daemon**: Configurable background daemon to clean safe targets (`.safe` risk tier) on user-defined schedules (e.g. weekly).
-- [ ] **Interactive Visual Tree Map**: Sunburst / Treemap visualizer for disk space breakdown (interactive DaisyDisk-style visualization).
-- [ ] **Docker & Podman Volume Purger**: Detects and prunes dangling volumes, unused images, and stopped containers.
+- ✅ **Menu Bar Status Extra Widget**: Native macOS MenuBarExtra widget with live disk space monitoring and one-click quick clean shortcuts.
+- ✅ **Dynamic Custom JSON Plugin Target Engine**: Dynamic custom rule loader scanning `~/.config/disk-cleaner/plugins/*.json`.
+- ✅ **Docker & Podman Volume Purger**: Target rules for dangling volumes, stopped containers, and build caches (`docker system prune`).
+- ✅ **Xcode Simulator & Device Wiper**: Deep purge for Xcode Swift Previews, Simulator caches, and iOS/watchOS/tvOS DeviceSupport files.
+- ✅ **Homebrew Cask Orphan Cleaner**: Auto-purge orphaned Homebrew cask archives and downloads.
+- ✅ **Windows WinSxS DISM Component Store Analyzer**: Added Component Store DISM analysis to `DiskCleaner.exe`.
+- ✅ **Background Auto-Cleanup Daemon**: LaunchAgent script for weekly automated `.safe` tier cleaning (`scripts/install_auto_clean_daemon.sh`).
+- ✅ **AI & MCP Model Context Protocol Support**: Full `llms.txt` standard and machine-readable `--scan --json` CLI integration.
+- ✅ **Multiplatform Native Engines**: macOS (Swift/SwiftUI), Windows (`DiskCleaner.exe`), iOS, and Android.
+- ✅ **Automated GitHub Actions CI/CD Pipelines**: Automated multiplatform compilation tests and release packaging.
 
 ---
 
-## 🔮 v4.0.0 — Ecosystem Convergence (2027)
+## 🔮 Future Vision (v4.x / Future Releases)
 
-- [ ] **Unified Multiplatform Sync**: Synchronize cleanup preferences and device insights across Mac, Windows, iPhone, and Android via encrypted local P2P or iCloud/OneDrive sync.
-- [ ] **Plugin Target Engine**: Allow community members to contribute new cleanup target definitions using simple YAML/JSON schema plugins without recompiling the app.
+- [ ] **Unified Multiplatform P2P Sync**: Local encrypted device sync for user preferences across Mac, Windows, iPhone, and Android.
+- [ ] **Sunburst Storage TreeMap Visualizer**: Interactive sunburst disk space breakdown view.
