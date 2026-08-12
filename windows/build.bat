@@ -20,7 +20,7 @@ echo ==> Building Installable EXE (DiskCleaner-Windows-Setup.exe)
 makensis installer.nsi
 
 echo ==> Bundling Native Windows Executable Package (ZIP fallback)
-powershell -Command "Compress-Archive -Path out\* -DestinationPath out\DiskCleaner-Windows-v2.0.zip -Force"
+powershell -Command "Compress-Archive -Path out\* -DestinationPath out\DiskCleaner-Windows-v3.0.zip -Force"
 
 echo.
 echo Build Complete!

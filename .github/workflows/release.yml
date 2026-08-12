@@ -1,0 +1,23 @@
+name: Publish GitHub Release Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build & Upload Release Binaries
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build macOS Release Package
+        run: |
+          chmod +x build.sh
+          ./build.sh
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: out/DiskCleaner-*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
