@@ -7,23 +7,23 @@
   <!-- Primary Meta Tags -->
   <title>Disk Cleaner — The Ultimate Open-Source Multiplatform System Utility</title>
   <meta name="title" content="Disk Cleaner — The Ultimate Open-Source Multiplatform System Utility">
-  <meta name="description" content="100% Free & Open-Source disk cleaner, storage optimizer, duplicate finder, and app uninstaller for macOS, iOS, Android & Windows. Zero tracking, single native binary, parallel speed.">
-  <meta name="keywords" content="Mac disk cleaner, open source Mac cleaner, CleanMyMac alternative, system optimizer, duplicate file finder, app uninstaller, native Swift disk utility, iOS storage cleaner, Android cleaner, Windows storage utility">
+  <meta name="description" content="100% Free & Open-Source storage optimizer, duplicate finder, and app uninstaller for macOS, Windows, iOS & Android. Zero tracking, single native binary, sub-second speed.">
+  <meta name="keywords" content="Mac disk cleaner, Windows disk cleaner, open source Mac cleaner, CleanMyMac alternative, system optimizer, duplicate file finder, app uninstaller, native Swift disk utility, iOS storage cleaner, Android cleaner">
   <meta name="author" content="Koushik Kandi">
   <meta name="theme-color" content="#0b0f19">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://kandikoushik.github.io/disk-cleaner/">
-  <meta property="og:title" content="Disk Cleaner — The Ultimate Open-Source Multiplatform Utility">
-  <meta property="og:description" content="Recover tens of gigabytes in seconds. 100% Open-Source multiplatform storage optimizer for macOS, iOS, Android, and Windows with zero background tracking.">
+  <meta property="og:title" content="Disk Cleaner — Open-Source Multiplatform Utility">
+  <meta property="og:description" content="Recover storage across macOS, Windows, iOS, and Android. 100% Open-Source multiplatform storage utility with zero background telemetry.">
   <meta property="og:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/docs/app-icon.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://kandikoushik.github.io/disk-cleaner/">
-  <meta property="twitter:title" content="Disk Cleaner — Best Open-Source System Utility">
-  <meta property="twitter:description" content="100% Free & Open-Source native disk cleaner, storage optimizer, and system utility for macOS, iOS, Android, and Windows. Single native binary, no tracking.">
+  <meta property="twitter:title" content="Disk Cleaner — Multiplatform Storage Optimizer">
+  <meta property="twitter:description" content="100% Free & Open-Source native disk cleaner for macOS, Windows, iOS, and Android. Single native binary, zero tracking.">
   <meta property="twitter:image" content="https://raw.githubusercontent.com/kandikoushik/disk-cleaner/main/docs/app-icon.png">
 
   <!-- Favicon -->
@@ -40,7 +40,7 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "Disk Cleaner",
-    "operatingSystem": "macOS 14.0+, iOS 17.0+, Android, Windows 11",
+    "operatingSystem": "macOS 14.0+, Windows 11, iOS 17.0+, Android",
     "applicationCategory": "UtilitiesApplication",
     "license": "https://www.apache.org/licenses/LICENSE-2.0",
     "offers": {
@@ -48,7 +48,7 @@
       "price": "0",
       "priceCurrency": "USD"
     },
-    "description": "Native multiplatform disk cleanup, storage optimizer, app uninstaller, and duplicate file finder for macOS, iOS, Android, and Windows.",
+    "description": "Native multiplatform disk cleanup, storage optimizer, app uninstaller, and duplicate file finder for macOS, Windows, iOS, and Android.",
     "author": {
       "@type": "Person",
       "name": "Koushik Kandi",
@@ -272,6 +272,26 @@
       box-shadow: 0 0 45px rgba(16, 185, 129, 0.55);
     }
 
+    .btn-windows {
+      background: linear-gradient(135deg, #0284c7, #3b82f6);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 30px rgba(2, 132, 199, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-windows:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 45px rgba(59, 130, 246, 0.55);
+    }
+
     .btn-secondary {
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-main);
@@ -374,9 +394,9 @@
     }
 
     .badge-macos { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-windows { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
     .badge-ios { background: rgba(249, 115, 22, 0.15); color: #f97316; border: 1px solid rgba(249, 115, 22, 0.3); }
     .badge-android { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
-    .badge-windows { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
     .platform-card h3 {
       font-family: var(--font-heading);
@@ -389,6 +409,21 @@
       color: var(--text-muted);
       font-size: 0.92rem;
       line-height: 1.6;
+    }
+
+    .platform-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    .platform-link:hover {
+      text-decoration: underline;
     }
 
     /* Section Styling */
@@ -708,7 +743,7 @@
         <li><a href="#ecosystem">Platforms</a></li>
         <li><a href="#features">Features</a></li>
         <li><a href="#comparison">Comparison</a></li>
-        <li><a href="#safety">Safety</a></li>
+        <li><a href="#ai">AI & MCP</a></li>
         <li><a href="#quickstart">Quickstart</a></li>
         <li>
           <a href="https://github.com/kandikoushik/disk-cleaner" target="_blank" class="btn-github">
@@ -728,13 +763,13 @@
       </div>
       <br>
       <div class="badge-pill">
-        ⚡ 100% Free & Open Source • Apache 2.0 License • macOS, iOS, Android & Windows
+        ⚡ 100% Free & Open Source • Apache 2.0 License • macOS, Windows, iOS & Android
       </div>
       <h1>
-        Recover Tens of Gigabytes.<br><span>Privately & Blazingly Fast.</span>
+        Recover Storage Across All Devices.<br><span>Privately & Blazingly Fast.</span>
       </h1>
       <p class="hero-subtitle">
-        The best open-source native multiplatform storage optimizer. Built in pure Swift for macOS & iOS with parallel TaskGroup sizing, content-hash duplicate detection, deep app uninstallation, and zero background telemetry.
+        The ultimate open-source multiplatform storage utility. Built in pure Swift for macOS & iOS, C# for Windows (`DiskCleaner.exe`), and Kotlin for Android — with zero background telemetry and parallel multi-core speed.
       </p>
       
       <div class="hero-cta">
@@ -742,29 +777,33 @@
           <span>Download macOS DMG (v2.0)</span>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </a>
+        <a href="https://github.com/kandikoushik/disk-cleaner/tree/main/windows" target="_blank" class="btn-windows">
+          <span>Windows DiskCleaner.exe</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.801"/></svg>
+        </a>
         <a href="https://github.com/kandikoushik/disk-cleaner" target="_blank" class="btn-secondary">
           <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          View Source Code
+          View Source
         </a>
       </div>
 
       <!-- Stats Grid -->
       <div class="stats-grid">
         <div class="stat-card">
-          <div class="stat-number">41+ GB</div>
-          <div class="stat-label">Space Recovered 1st Pass</div>
+          <div class="stat-number">Sub-Second</div>
+          <div class="stat-label">Parallel TaskGroup Speed</div>
         </div>
         <div class="stat-card">
           <div class="stat-number">~30</div>
           <div class="stat-label">Smart Cleanup Targets</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">0 ms</div>
-          <div class="stat-label">Network Telemetry (100% Offline)</div>
+          <div class="stat-number">4</div>
+          <div class="stat-label">Supported Ecosystem Platforms</div>
         </div>
         <div class="stat-card">
-          <div class="stat-number">4</div>
-          <div class="stat-label">Supported Platforms</div>
+          <div class="stat-number">0 ms</div>
+          <div class="stat-label">Network Telemetry (100% Offline)</div>
         </div>
       </div>
     </div>
@@ -774,8 +813,8 @@
   <section id="ecosystem">
     <div class="container">
       <div class="section-title">
-        <h2>Multiplatform Ecosystem</h2>
-        <p>Tailored native engines providing storage insights and cleanup across all your devices.</p>
+        <h2>Multiplatform Native Ecosystem</h2>
+        <p>Tailored native engines providing storage insights and cleanup across desktop and mobile devices.</p>
       </div>
 
       <div class="platform-grid">
@@ -785,6 +824,16 @@
             <span class="platform-badge badge-macos">v2.0 Stable</span>
           </div>
           <p>Single Swift binary with SwiftUI & Liquid Glass interface. Features ~30 smart target scanning, parallel TaskGroup sizing, 3-pass SHA-256 duplicate hashing, and Spotlight/LaunchServices repair.</p>
+          <a href="https://github.com/kandikoushik/disk-cleaner/releases/download/v2.0.0/DiskCleaner-2.0.dmg" class="platform-link">Download DiskCleaner-2.0.dmg &rarr;</a>
+        </div>
+
+        <div class="platform-card">
+          <div class="platform-header">
+            <h3>Windows `.exe`</h3>
+            <span class="platform-badge badge-windows">C# Standalone</span>
+          </div>
+          <p>High-speed Windows Temp, Prefetch, WinSxS, and browser cache cleaner engine (`DiskCleaner.exe`) integrated with PowerShell scripts and NSIS installer.</p>
+          <a href="https://github.com/kandikoushik/disk-cleaner/tree/main/windows" target="_blank" class="platform-link">View Windows Executable Guide &rarr;</a>
         </div>
 
         <div class="platform-card">
@@ -793,6 +842,7 @@
             <span class="platform-badge badge-ios">SwiftUI Companion</span>
           </div>
           <p>Mobile photo & video duplicate detection, cache diagnostic insight, and local device storage breakdown built in pure Swift for iPhone and iPad.</p>
+          <a href="https://github.com/kandikoushik/disk-cleaner/tree/main/iOS" target="_blank" class="platform-link">Explore iOS Source &rarr;</a>
         </div>
 
         <div class="platform-card">
@@ -801,14 +851,7 @@
             <span class="platform-badge badge-android">Kotlin SDK</span>
           </div>
           <p>Storage analyzer and junk APK purge engine built with modern Kotlin architecture for Android smartphones and tablets.</p>
-        </div>
-
-        <div class="platform-card">
-          <div class="platform-header">
-            <h3>Windows</h3>
-            <span class="platform-badge badge-windows">C# / PowerShell</span>
-          </div>
-          <p>High-speed Windows Temp, Prefetch, WinSxS, and browser cache cleaner engine integrated with PowerShell automation scripts.</p>
+          <a href="https://github.com/kandikoushik/disk-cleaner/tree/main/android" target="_blank" class="platform-link">Explore Android Engine &rarr;</a>
         </div>
       </div>
     </div>
@@ -819,7 +862,7 @@
     <div class="container">
       <div class="section-title">
         <h2>Built for Power Users & Developers</h2>
-        <p>Comprehensive system cleanup, deep residue uninstallation, and file deduplication engineered in native Swift.</p>
+        <p>Comprehensive system cleanup, deep residue uninstallation, and file deduplication engineered in native Swift & C#.</p>
       </div>
 
       <div class="features-grid">
@@ -880,13 +923,13 @@
         </div>
 
         <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3>Activity & Port Guard</h3>
-          <p>Inspects listening network ports and memory-heavy processes. Features a guarded process termination system protecting vital system daemons.</p>
+          <div class="feature-icon">🤖</div>
+          <h3>AI & MCP Server Support</h3>
+          <p>Native Model Context Protocol (MCP) server support with <code>llms.txt</code> standard and machine-readable <code>--scan --json</code> CLI outputs for AI assistants.</p>
           <div class="feature-tags">
-            <span class="tag">Active Ports</span>
-            <span class="tag">Process List</span>
-            <span class="tag">Guarded Quit</span>
+            <span class="tag">llms.txt</span>
+            <span class="tag">MCP Server</span>
+            <span class="tag">JSON CLI</span>
           </div>
         </div>
       </div>
@@ -924,11 +967,27 @@
             </tr>
             <tr>
               <td><strong>Multiplatform Ecosystem</strong></td>
-              <td class="highlight-col check-yes">✅ macOS, iOS, Android, Windows</td>
+              <td class="highlight-col check-yes">✅ macOS, Windows, iOS, Android</td>
               <td class="check-no">❌ macOS Only</td>
               <td class="check-no">❌ macOS Only</td>
               <td class="check-no">❌ macOS Only</td>
               <td>Windows/Mac</td>
+            </tr>
+            <tr>
+              <td><strong>Standalone Windows `.exe`</strong></td>
+              <td class="highlight-col check-yes">✅ Built-in `DiskCleaner.exe`</td>
+              <td class="check-no">❌ No</td>
+              <td class="check-no">❌ No</td>
+              <td class="check-no">❌ No</td>
+              <td>Installed Only</td>
+            </tr>
+            <tr>
+              <td><strong>AI & MCP Support</strong></td>
+              <td class="highlight-col check-yes">✅ `llms.txt` + MCP Server</td>
+              <td class="check-no">❌ No</td>
+              <td class="check-no">❌ No</td>
+              <td class="check-no">❌ No</td>
+              <td class="check-no">❌ No</td>
             </tr>
             <tr>
               <td><strong>Zero Network Telemetry</strong></td>
@@ -938,67 +997,43 @@
               <td class="check-yes">✅ Offline</td>
               <td class="check-no">❌ Telemetry Services</td>
             </tr>
-            <tr>
-              <td><strong>Native Swift / SwiftUI UI</strong></td>
-              <td class="highlight-col check-yes">✅ Liquid Glass Native</td>
-              <td>Custom UI</td>
-              <td>Custom UI</td>
-              <td>Native UI</td>
-              <td class="check-no">Electron / Heavy</td>
-            </tr>
-            <tr>
-              <td><strong>Parallel TaskGroup Speed</strong></td>
-              <td class="highlight-col check-yes">✅ Multi-core Swift</td>
-              <td>Sequential / Multi</td>
-              <td class="check-yes">Multi-core</td>
-              <td class="check-no">Sequential</td>
-              <td class="check-no">Sequential</td>
-            </tr>
-            <tr>
-              <td><strong>3-Pass Duplicate Hash</strong></td>
-              <td class="highlight-col check-yes">✅ Size → Head → SHA256</td>
-              <td class="check-yes">✅ Included</td>
-              <td class="check-no">❌ No</td>
-              <td class="check-no">❌ No</td>
-              <td>Basic</td>
-            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </section>
 
-  <!-- Safety & Architecture Section -->
-  <section id="safety">
+  <!-- AI & MCP Section -->
+  <section id="ai">
     <div class="container">
       <div class="section-title">
-        <h2>Architectural Safety Guarantees</h2>
-        <p>Designed from the ground up so you never accidentally delete crucial personal data.</p>
+        <h2>AI Agent & MCP Automation Ready</h2>
+        <p>Built for AI assistants (ChatGPT, Claude, Gemini, Antigravity, Cursor) with official <code>llms.txt</code> standard and MCP tools.</p>
       </div>
 
       <div class="architecture-box">
         <div class="arch-item">
           <h4>
-            <span style="color: var(--accent-emerald);">🔒</span>
-            Cleaner.allowed() Gate
+            <span style="color: var(--accent-purple);">📄</span>
+            llms.txt Standard
           </h4>
-          <p>Every single deletion request passes through a hardcoded safety gate. Rejects any paths outside your <code>$HOME</code> directory and strictly protects the root home folder itself.</p>
+          <p>Standardized Machine Context file at <a href="llms.txt" target="_blank" style="color: var(--accent-cyan);">/llms.txt</a> allowing AI web search engines and agents to discover Disk Cleaner features.</p>
         </div>
 
         <div class="arch-item">
           <h4>
-            <span style="color: var(--accent-cyan);">🗑️</span>
-            Trash-First Deletion
+            <span style="color: var(--accent-emerald);">🔌</span>
+            Model Context Protocol
           </h4>
-          <p>By default, deleted files are moved directly to the macOS Finder Trash. If you ever change your mind, recovery is a simple Finder drag-and-drop away.</p>
+          <p>Full MCP Server schema specification in <a href="https://github.com/kandikoushik/disk-cleaner/blob/main/MCP_GUIDE.md" target="_blank" style="color: var(--accent-cyan);">MCP_GUIDE.md</a> defining tools for disk scanning and dry-run cleanup.</p>
         </div>
 
         <div class="arch-item">
           <h4>
-            <span style="color: var(--accent-purple);">🛡️</span>
-            System Process Shield
+            <span style="color: var(--accent-cyan);">⚙️</span>
+            Machine JSON CLI
           </h4>
-          <p>Process termination routines check against a protected whitelist and refuse to quit system daemons, root processes, or services owned by other users.</p>
+          <p>Execute <code>--scan --json</code> to receive structured JSON target definitions, sizes, and risk levels without parsing raw text.</p>
         </div>
       </div>
     </div>
@@ -1009,7 +1044,7 @@
     <div class="container">
       <div class="section-title">
         <h2>Build & Run in Seconds</h2>
-        <p>No external dependencies required. Build the native app bundle and DMG installer directly from source.</p>
+        <p>No external dependencies required. Build native app bundle and DMG installer directly from source.</p>
       </div>
 
       <div class="terminal-window">
@@ -1045,6 +1080,7 @@
       <ul class="footer-links">
         <li><a href="https://github.com/kandikoushik/disk-cleaner" target="_blank">GitHub Repository</a></li>
         <li><a href="https://github.com/kandikoushik/disk-cleaner/blob/main/LICENSE" target="_blank">Apache 2.0 License</a></li>
+        <li><a href="llms.txt" target="_blank">llms.txt</a></li>
         <li><a href="https://github.com/kandikoushik/disk-cleaner/releases" target="_blank">Releases</a></li>
       </ul>
     </div>

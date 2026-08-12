@@ -45,7 +45,7 @@ Disk Cleaner natively supports **AI discovery and Model Context Protocol (MCP)**
 
 ## 🌟 Why Disk Cleaner is the Best Open-Source Cleaner
 
-Most disk cleaners are bloated, require monthly subscriptions, or collect personal data in the background. **Disk Cleaner** was born out of necessity when a developer Mac hit **249 MB free space** — recovering **41+ GB** on its very first pass.
+Most disk cleaners are bloated, require monthly subscriptions, or collect personal data in the background. **Disk Cleaner** provides a completely free, transparent, open-source native alternative designed for performance and safety.
 
 ### 🥊 Comparison: Disk Cleaner vs. Proprietary Alternatives
 
@@ -58,6 +58,43 @@ Most disk cleaners are bloated, require monthly subscriptions, or collect person
 | **Privacy & Zero Telemetry** | ✅ **Zero Network Access** | ❌ Background Analytics | ❓ Minimal | ✅ Local Only | ❌ Background Services |
 | **Parallel TaskGroup Speed** | ✅ **Multi-threaded Swift** | ❓ Single/Multi | ⚡ Multi-threaded | 🐌 Sequential | 🐌 Slow |
 | **Triple-Pass Duplicate Hash** | ✅ **Byte → Head → SHA-256** | ✅ Included | ❌ No | ❌ No | ⚠️ Basic |
+
+---
+
+## ⚡ Core macOS Features & Capabilities
+
+### 🧹 1. Smart Clean (~30 High-Yield Targets)
+Cleans up gigabytes of accumulated junk grouped by explicit risk levels:
+- 🟢 **Safe**: Pure caches (Xcode DerivedData, CocoaPods, SwiftPM, Homebrew cache, browser caches, system logs) that auto-regenerate.
+- 🟡 **Rebuild**: Download caches and compilation artifacts (npm/yarn/pnpm cache, Cargo cache, Docker containers, Go build caches) that cost a re-download or re-compile.
+- 🔴 **Review**: User files, Downloads folder items, and Trash — never automatically auto-selected.
+
+### 🔍 2. Disk Space Explorer
+Visualizes storage hogs instantly:
+- Highlights the **largest files** and **biggest directories** across your drive.
+- Identifies untouched files **older than 1 year** for quick archiving or removal.
+
+### 📦 3. Deep App Uninstaller
+Finds all leftover traces that dragging an app to the Trash leaves behind:
+- Application Support folders
+- Application Caches & Saved States
+- Sandbox Containers & Preferences
+- Background LaunchAgents and LaunchDaemons
+
+### 👯 4. High-Performance Duplicate Finder
+Employs a **three-pass streaming deduplication engine** designed for maximum speed:
+1. **Pass 1**: Instant grouping by exact file size.
+2. **Pass 2**: 64 KB head hash comparison (filters out 95%+ non-duplicates without reading whole files).
+3. **Pass 3**: Full SHA-256 hash validation for guaranteed 100% match accuracy.
+
+---
+
+## 🛡️ Ironclad Safety Guarantees
+
+1. **`Cleaner.allowed()` Safety Chokepoint**: Every deletion request passes through a central security gate that strictly rejects paths outside your `$HOME` directory and protects `$HOME` root itself.
+2. **Trash-First Deletion**: All deleted items move to the macOS **Trash** by default, allowing simple drag-and-drop recovery if needed.
+3. **Protected Process Shield**: Prevents terminating root processes, system daemons, or background services owned by other system users.
+4. **Offline & Sandboxed**: Contains **zero network calls**, analytics, or telemetry code.
 
 ---
 
